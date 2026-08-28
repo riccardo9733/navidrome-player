@@ -14,6 +14,16 @@ export const metadata: Metadata = {
   title: "Navidrome PWA Player",
   description: "Next-generation PWA player for Navidrome / Subsonic music servers with offline listening and synced lyrics",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.svg", type: "image/svg+xml", sizes: "192x192" },
+      { url: "/icons/icon-512.svg", type: "image/svg+xml", sizes: "512x512" },
+    ],
+    apple: [
+      { url: "/icons/icon-192.svg", type: "image/svg+xml", sizes: "192x192" },
+    ],
+    shortcut: "/icons/icon-192.svg",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

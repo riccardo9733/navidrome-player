@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
   <defs>
-    <linearGradient id="bgGrad192" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="bgGradApple" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#4f46e5" />
       <stop offset="50%" stop-color="#9333ea" />
       <stop offset="100%" stop-color="#ec4899" />
@@ -8,7 +8,7 @@
   </defs>
 
   <!-- Gradient Squircle Base (Transparent Background) -->
-  <rect width="192" height="192" rx="45" fill="url(#bgGrad192)" />
+  <rect width="192" height="192" rx="45" fill="url(#bgGradApple)" />
 
   <!-- Stylized Vinyl Record Disc3 Element -->
   <g stroke="#ffffff" stroke-linecap="round" fill="none">

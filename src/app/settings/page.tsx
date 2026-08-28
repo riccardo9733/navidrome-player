@@ -19,6 +19,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useSettingsStore } from "../../store/useSettingsStore";
 import { BitrateOption, TranscodingFormat } from "../../lib/subsonic/types";
 import { clearAllDownloads } from "../../lib/db/downloadManager";
+import { PwaInstallCard } from "../../components/settings/PwaInstallCard";
 
 export default function SettingsPage() {
   const profiles = useAuthStore((s) => s.profiles);
@@ -97,7 +98,7 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="pb-4 border-b border-zinc-800">
         <h1 className="text-2xl md:text-3xl font-extrabold text-white">Impostazioni</h1>
-        <p className="text-xs text-zinc-400">Configurazione server Navidrome, qualità audio, equalizzatore e cache</p>
+        <p className="text-xs text-zinc-400">Configurazione server Navidrome, app PWA, qualità audio, equalizzatore e cache</p>
       </div>
 
       {/* Live Server Status Card */}
@@ -359,7 +360,10 @@ export default function SettingsPage() {
         )}
       </section>
 
-      {/* 2. Streaming & Quality Settings */}
+      {/* 2. PWA Mobile & Desktop Section */}
+      <PwaInstallCard />
+
+      {/* 3. Streaming & Quality Settings */}
       <section className="space-y-4">
         <div className="flex items-center gap-2.5">
           <Radio size={20} className="text-indigo-400" />
@@ -442,7 +446,7 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      {/* 3. Cache & Storage Section */}
+      {/* 4. Cache & Storage Section */}
       <section className="space-y-4">
         <div className="flex items-center gap-2.5">
           <HardDrive size={20} className="text-indigo-400" />

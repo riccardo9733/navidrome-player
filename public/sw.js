@@ -1,9 +1,10 @@
-const CACHE_NAME = "navidrome-pwa-v2";
-const COVERS_CACHE = "navidrome-covers-v2";
+const CACHE_NAME = "navidrome-pwa-v3";
+const COVERS_CACHE = "navidrome-covers-v3";
 const STATIC_ASSETS = [
   "/",
   "/manifest.json",
-  "/favicon.ico"
+  "/icons/icon-192.svg",
+  "/icons/icon-512.svg",
 ];
 
 self.addEventListener("install", (event) => {
