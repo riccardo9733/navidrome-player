@@ -10,22 +10,63 @@ import { TrackRow } from "../../../components/shared/TrackRow";
 import { formatDuration } from "../../../lib/utils/formatters";
 import { downloadPlaylist } from "../../../lib/db/downloadManager";
 
+import { getOfflinePlaylist, isBrowserOffline } from "../../../lib/db/offlineProvider";
+import { isTrackDownloaded } from "../../../lib/db/downloadManager";
+import { useDownloadStore } from "../../../store/useDownloadStore";
+
 export default function PlaylistDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [loading, setLoading] = useState(true);
-  const [downloading, setDownloading] = useState(false);
-  const [downloadProgress, setDownloadProgress] = useState(0);
   const [isDownloaded, setIsDownloaded] = useState(false);
+
+  const downloadState = useDownloadStore((s) => s.downloadingItems[id]);
+  const downloadPlaylistAction = useDownloadStore((s) => s.downloadPlaylistAction);
+  const isDownloading = downloadState?.status === "downloading";
+  const downloadProgress = downloadState?.progress || 0;
 
   const playSong = usePlayerStore((s) => s.playSong);
 
   useEffect(() => {
+    if (downloadState?.status === "completed") {
+      setIsDownloaded(true);
+    }
+  }, [downloadState?.status]);
+
+  useEffect(() => {
     setLoading(true);
+
+    if (isBrowserOffline()) {
+      getOfflinePlaylist(id)
+        .then((pl) => {
+          if (pl) {
+            setPlaylist(pl);
+            setIsDownloaded(true);
+          }
+        })
+        .finally(() => setLoading(false));
+      return;
+    }
+
     subsonicClient
       .getPlaylist(id)
-      .then(setPlaylist)
-      .catch((err) => console.error("Error loading playlist:", err))
+      .then(async (data) => {
+        setPlaylist(data);
+        if (data.entry && data.entry.length > 0) {
+          const downloadChecks = await Promise.all(
+            data.entry.map((s) => isTrackDownloaded(s.id))
+          );
+          setIsDownloaded(downloadChecks.every(Boolean));
+        }
+      })
+      .catch(async (err) => {
+        console.warn("Online playlist detail failed, fallback to offline:", err);
+        const offPl = await getOfflinePlaylist(id);
+        if (offPl) {
+          setPlaylist(offPl);
+          setIsDownloaded(true);
+        }
+      })
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -67,19 +108,9 @@ export default function PlaylistDetailPage({ params }: { params: Promise<{ id: s
     }
   };
 
-  const handleDownloadPlaylist = async () => {
-    if (downloading || isDownloaded) return;
-    setDownloading(true);
-    try {
-      await downloadPlaylist(playlist, (completed, total) => {
-        setDownloadProgress(Math.round((completed / total) * 100));
-      });
-      setIsDownloaded(true);
-    } catch (err) {
-      console.error("Failed to download playlist:", err);
-    } finally {
-      setDownloading(false);
-    }
+  const handleDownloadPlaylist = () => {
+    if (isDownloading || isDownloaded || !playlist) return;
+    downloadPlaylistAction(playlist);
   };
 
   const totalDuration = songs.reduce((acc, s) => acc + (s.duration || 0), 0);
@@ -140,16 +171,16 @@ export default function PlaylistDetailPage({ params }: { params: Promise<{ id: s
               className={`flex items-center gap-2 px-4 py-3 rounded-full border text-sm font-semibold transition-colors ${
                 isDownloaded
                   ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                  : downloading
+                  : isDownloading
                   ? "bg-indigo-500/10 border-indigo-500/20 text-indigo-400 animate-pulse"
                   : "bg-zinc-900 border-zinc-800 hover:bg-zinc-800 text-zinc-300"
               }`}
             >
               {isDownloaded ? (
                 <>
-                  <Check size={16} /> Scaricata
+                  <Check size={16} /> Scaricato
                 </>
-              ) : downloading ? (
+              ) : isDownloading ? (
                 <>
                   <Loader2 size={16} className="animate-spin" /> {downloadProgress}%
                 </>

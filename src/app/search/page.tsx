@@ -8,40 +8,83 @@ import { subsonicClient } from "../../lib/subsonic/client";
 import { TrackRow } from "../../components/shared/TrackRow";
 import { AlbumCard } from "../../components/shared/AlbumCard";
 import { ArtistCard } from "../../components/shared/ArtistCard";
+import { searchOffline, isBrowserOffline } from "../../lib/db/offlineProvider";
+import { WifiOff } from "lucide-react";
 
 function SearchContent() {
   const searchParams = useSearchParams();
-  const initialQuery = searchParams.get("q") || "";
+  const qParam = searchParams.get("q") || "";
 
-  const [query, setQuery] = useState(initialQuery);
+  const [query, setQuery] = useState(qParam);
   const [loading, setLoading] = useState(false);
   const [songs, setSongs] = useState<Song[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
   const [artists, setArtists] = useState<Artist[]>([]);
+  const [isOffline, setIsOffline] = useState(false);
+
+  // Sync state when URL parameter changes (e.g., navigated from Header or History)
+  useEffect(() => {
+    setQuery(qParam);
+  }, [qParam]);
 
   useEffect(() => {
-    if (!query.trim()) {
+    const trimmed = query.trim();
+    if (!trimmed) {
       setSongs([]);
       setAlbums([]);
       setArtists([]);
+      // Clean up URL if empty
+      if (window.location.search) {
+        window.history.replaceState(null, "", "/search");
+      }
       return;
     }
 
-    const timer = setTimeout(() => {
+    // Update URL parameter without triggering full navigation reload
+    const newUrl = `/search?q=${encodeURIComponent(trimmed)}`;
+    if (window.location.pathname + window.location.search !== newUrl) {
+      window.history.replaceState(null, "", newUrl);
+    }
+
+    const timer = setTimeout(async () => {
       setLoading(true);
+
+      if (isBrowserOffline()) {
+        setIsOffline(true);
+        const offRes = await searchOffline(trimmed);
+        setSongs(offRes.songs);
+        setAlbums(offRes.albums);
+        setArtists(offRes.artists);
+        setLoading(false);
+        return;
+      }
+
       subsonicClient
-        .search(query.trim())
+        .search(trimmed)
         .then((res) => {
           setSongs(res?.song || []);
           setAlbums(res?.album || []);
           setArtists(res?.artist || []);
+          setIsOffline(false);
         })
-        .catch((err) => console.error("Search error:", err))
+        .catch(async (err) => {
+          console.warn("Online search failed, fallback to offline:", err);
+          setIsOffline(true);
+          const offRes = await searchOffline(trimmed);
+          setSongs(offRes.songs);
+          setAlbums(offRes.albums);
+          setArtists(offRes.artists);
+        })
         .finally(() => setLoading(false));
-    }, 300);
+    }, 250);
 
     return () => clearTimeout(timer);
   }, [query]);
+
+  const handleClear = () => {
+    setQuery("");
+    window.history.replaceState(null, "", "/search");
+  };
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto animate-in fade-in duration-300">
@@ -52,12 +95,32 @@ function SearchContent() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Cerca brani, artisti o album..."
+          placeholder="Cerca brani, artisti o album in tempo reale..."
           autoFocus
-          className="w-full bg-zinc-900/90 text-base text-white placeholder-zinc-500 rounded-2xl pl-12 pr-4 py-3.5 border border-zinc-800 focus:border-indigo-500 focus:outline-none shadow-xl transition-all"
+          className="w-full bg-zinc-900/90 text-base text-white placeholder-zinc-500 rounded-2xl pl-12 pr-12 py-3.5 border border-zinc-800 focus:border-indigo-500 focus:outline-none shadow-xl transition-all"
         />
-        {loading && <Loader2 size={20} className="absolute right-4 animate-spin text-indigo-400" />}
+        {loading ? (
+          <Loader2 size={20} className="absolute right-4 animate-spin text-indigo-400" />
+        ) : query ? (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="absolute right-4 p-1 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+            title="Cancella ricerca"
+          >
+            <span className="sr-only">Cancella</span>
+            ✕
+          </button>
+        ) : null}
       </div>
+
+      {/* Offline search alert banner */}
+      {isOffline && query.trim() && (
+        <div className="flex items-center justify-center gap-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-medium max-w-xl mx-auto">
+          <WifiOff size={14} />
+          <span>Ricerca offline tra i brani, album e artisti scaricati in locale</span>
+        </div>
+      )}
 
       {/* Results */}
       {!query.trim() ? (

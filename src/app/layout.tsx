@@ -6,6 +6,7 @@ import { Header } from "../components/layout/Header";
 import { RightSidebar } from "../components/layout/RightSidebar";
 import { BottomPlayerBar } from "../components/player/BottomPlayerBar";
 import { MiniPlayer } from "../components/player/MiniPlayer";
+import { MobileNav } from "../components/layout/MobileNav";
 import { FullscreenPlayerModal } from "../components/player/FullscreenPlayerModal";
 import { EqualizerModal } from "../components/audio/EqualizerModal";
 
@@ -58,6 +59,9 @@ export default function RootLayout({
 
           {/* Mobile Floating Mini Player */}
           <MiniPlayer />
+
+          {/* Mobile Persistent Bottom Navigation */}
+          <MobileNav />
 
           {/* Fullscreen Player Modal / Mobile Vaul Drawer */}
           <FullscreenPlayerModal />

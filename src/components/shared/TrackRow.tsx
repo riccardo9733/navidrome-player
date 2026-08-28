@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Play, Pause, Heart, Download, Check, MoreVertical, Music, ListPlus, Radio } from "lucide-react";
+import { Play, Pause, Heart, Download, Check, MoreVertical, Music, ListPlus, Radio, Loader2 } from "lucide-react";
 import { Song } from "../../lib/subsonic/types";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import { subsonicClient } from "../../lib/subsonic/client";
-import { downloadTrack, isTrackDownloaded, deleteDownloadedTrack } from "../../lib/db/downloadManager";
+import { deleteDownloadedTrack, isTrackDownloaded } from "../../lib/db/downloadManager";
 import { formatDuration } from "../../lib/utils/formatters";
+import { useDownloadStore } from "../../store/useDownloadStore";
 
 interface TrackRowProps {
   song: Song;
@@ -32,13 +33,22 @@ export function TrackRow({
   const togglePlay = usePlayerStore((s) => s.togglePlay);
   const addToQueue = usePlayerStore((s) => s.addToQueue);
 
+  const downloadState = useDownloadStore((s) => s.downloadingItems[song.id]);
+  const downloadTrackAction = useDownloadStore((s) => s.downloadTrackAction);
+  const isDownloading = downloadState?.status === "downloading";
+
   const [isStarred, setIsStarred] = useState(Boolean(song.starred));
   const [isDownloaded, setIsDownloaded] = useState(Boolean(song.isDownloaded));
-  const [downloading, setDownloading] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const isCurrentTrack = currentSong?.id === song.id;
   const isCurrentlyPlaying = isCurrentTrack && isPlaying;
+
+  useEffect(() => {
+    if (downloadState?.status === "completed") {
+      setIsDownloaded(true);
+    }
+  }, [downloadState?.status]);
 
   useEffect(() => {
     isTrackDownloaded(song.id).then((downloaded) => setIsDownloaded(downloaded));
@@ -69,21 +79,13 @@ export function TrackRow({
 
   const handleDownloadToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (downloading) return;
+    if (isDownloading) return;
 
     if (isDownloaded) {
       await deleteDownloadedTrack(song.id);
       setIsDownloaded(false);
     } else {
-      setDownloading(true);
-      try {
-        await downloadTrack(song, true);
-        setIsDownloaded(true);
-      } catch (err) {
-        console.error("Failed to download track:", err);
-      } finally {
-        setDownloading(false);
-      }
+      downloadTrackAction(song);
     }
   };
 
@@ -176,16 +178,22 @@ export function TrackRow({
         {/* Offline Download indicator / button */}
         <button
           onClick={handleDownloadToggle}
-          title={isDownloaded ? "Scaricato offline" : "Scarica offline"}
+          title={isDownloaded ? "Scaricato offline" : isDownloading ? "Download in corso..." : "Scarica offline"}
           className={`p-1.5 rounded-lg transition-colors ${
             isDownloaded
               ? "text-emerald-400 bg-emerald-500/10"
-              : downloading
-              ? "text-indigo-400 animate-pulse"
+              : isDownloading
+              ? "text-indigo-400 opacity-100"
               : "text-zinc-500 hover:text-zinc-300 opacity-0 group-hover:opacity-100"
           }`}
         >
-          {isDownloaded ? <Check size={15} /> : <Download size={15} />}
+          {isDownloaded ? (
+            <Check size={15} />
+          ) : isDownloading ? (
+            <Loader2 size={15} className="animate-spin text-indigo-400" />
+          ) : (
+            <Download size={15} />
+          )}
         </button>
 
         {/* Favorite Heart */}

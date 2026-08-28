@@ -92,7 +92,7 @@ export class SubsonicClient {
       return subResponse as unknown as T;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
-      console.error(`[SubsonicClient] Request to ${endpoint} failed:`, message);
+      console.warn(`[SubsonicClient] Request to ${endpoint} failed:`, message);
       throw err;
     }
   }
@@ -103,25 +103,54 @@ export class SubsonicClient {
     if (!this.isConfigured()) {
       return { serverVersion: "Demo Mode", openSubsonic: true };
     }
-    const res = await this.request<{ serverVersion?: string; openSubsonic?: boolean; version?: string }>("ping");
-    return {
-      serverVersion: res.serverVersion || res.version,
-      openSubsonic: res.openSubsonic ?? true,
-    };
+    try {
+      const res = await this.request<{ serverVersion?: string; openSubsonic?: boolean; version?: string }>("ping");
+      return {
+        serverVersion: res.serverVersion || res.version,
+        openSubsonic: res.openSubsonic ?? true,
+      };
+    } catch {
+      return { serverVersion: "Offline", openSubsonic: false };
+    }
   }
 
   public async getArtists(): Promise<Artist[]> {
     if (!this.isConfigured()) {
       return DEMO_ARTISTS;
     }
-    const res = await this.request<{ artists?: { index?: Array<{ artist?: Artist[] }> } }>("getArtists");
-    const artists: Artist[] = [];
-    res.artists?.index?.forEach((idx) => {
-      if (idx.artist) {
-        artists.push(...idx.artist);
+    try {
+      const res = await this.request<{ artists?: { index?: Array<{ artist?: Artist[] }> } }>("getArtists");
+      const artists: Artist[] = [];
+      res.artists?.index?.forEach((idx) => {
+        if (idx.artist) {
+          artists.push(...idx.artist);
+        }
+      });
+      return artists;
+    } catch (err) {
+      console.warn("[SubsonicClient] Remote getArtists failed, checking local cache:", err);
+      try {
+        const { db } = await import("../db/dexie");
+        const cachedAlbums = await db.cachedAlbums.toArray();
+        const artistMap = new Map<string, Artist>();
+        cachedAlbums.forEach((ca) => {
+          if (ca.album.artist) {
+            const key = ca.album.artistId || ca.album.artist;
+            if (!artistMap.has(key)) {
+              artistMap.set(key, {
+                id: key,
+                name: ca.album.artist,
+                coverArt: ca.album.coverArt,
+                albumCount: 1,
+              });
+            }
+          }
+        });
+        return Array.from(artistMap.values());
+      } catch {
+        return [];
       }
-    });
-    return artists;
+    }
   }
 
   public async getArtist(id: string): Promise<Artist> {
@@ -130,8 +159,27 @@ export class SubsonicClient {
       if (artist) return artist;
       return DEMO_ARTISTS[0];
     }
-    const res = await this.request<{ artist: Artist }>("getArtist", { id });
-    return res.artist;
+    try {
+      const res = await this.request<{ artist: Artist }>("getArtist", { id });
+      return res.artist;
+    } catch (err) {
+      console.warn(`[SubsonicClient] Remote getArtist(${id}) failed, checking local cache:`, err);
+      try {
+        const { db } = await import("../db/dexie");
+        const cachedAlbums = await db.cachedAlbums.toArray();
+        const albums = cachedAlbums.filter((ca) => ca.album.artistId === id || ca.album.artist === id).map((ca) => ca.album);
+        if (albums.length > 0) {
+          return {
+            id,
+            name: albums[0].artist || id,
+            coverArt: albums[0].coverArt,
+            albumCount: albums.length,
+            album: albums,
+          };
+        }
+      } catch {}
+      throw err;
+    }
   }
 
   public async getAlbumList(
@@ -145,11 +193,22 @@ export class SubsonicClient {
       }
       return DEMO_ALBUMS;
     }
-    const res = await this.request<{ albumList2?: { album?: Album[] }; albumList?: { album?: Album[] } }>(
-      "getAlbumList2",
-      { type, size, offset }
-    );
-    return res.albumList2?.album || res.albumList?.album || [];
+    try {
+      const res = await this.request<{ albumList2?: { album?: Album[] }; albumList?: { album?: Album[] } }>(
+        "getAlbumList2",
+        { type, size, offset }
+      );
+      return res.albumList2?.album || res.albumList?.album || [];
+    } catch (err) {
+      console.warn("[SubsonicClient] Remote getAlbumList failed, checking local cache:", err);
+      try {
+        const { db } = await import("../db/dexie");
+        const cached = await db.cachedAlbums.toArray();
+        return cached.map((c) => c.album);
+      } catch {
+        return [];
+      }
+    }
   }
 
   public async getAlbum(id: string): Promise<Album> {
@@ -158,16 +217,37 @@ export class SubsonicClient {
       if (album) return album;
       return DEMO_ALBUMS[0];
     }
-    const res = await this.request<{ album: Album }>("getAlbum", { id });
-    return res.album;
+    try {
+      const res = await this.request<{ album: Album }>("getAlbum", { id });
+      return res.album;
+    } catch (err) {
+      console.warn(`[SubsonicClient] Remote getAlbum(${id}) failed, checking local cache:`, err);
+      try {
+        const { db } = await import("../db/dexie");
+        const cached = await db.cachedAlbums.get(id);
+        if (cached) return cached.album;
+      } catch {}
+      throw err;
+    }
   }
 
   public async getPlaylists(): Promise<Playlist[]> {
     if (!this.isConfigured()) {
       return DEMO_PLAYLISTS;
     }
-    const res = await this.request<{ playlists?: { playlist?: Playlist[] } }>("getPlaylists");
-    return res.playlists?.playlist || [];
+    try {
+      const res = await this.request<{ playlists?: { playlist?: Playlist[] } }>("getPlaylists");
+      return res.playlists?.playlist || [];
+    } catch (err) {
+      console.warn("[SubsonicClient] Remote getPlaylists failed, fallback to local cache:", err);
+      try {
+        const { db } = await import("../db/dexie");
+        const cached = await db.cachedPlaylists.toArray();
+        return cached.map((c) => c.playlist);
+      } catch {
+        return [];
+      }
+    }
   }
 
   public async getPlaylist(id: string): Promise<Playlist> {
@@ -176,8 +256,18 @@ export class SubsonicClient {
       if (pl) return pl;
       return DEMO_PLAYLISTS[0];
     }
-    const res = await this.request<{ playlist: Playlist }>("getPlaylist", { id });
-    return res.playlist;
+    try {
+      const res = await this.request<{ playlist: Playlist }>("getPlaylist", { id });
+      return res.playlist;
+    } catch (err) {
+      console.warn(`[SubsonicClient] Remote getPlaylist(${id}) failed, fallback to local cache:`, err);
+      try {
+        const { db } = await import("../db/dexie");
+        const cached = await db.cachedPlaylists.get(id);
+        if (cached) return cached.playlist;
+      } catch {}
+      throw err;
+    }
   }
 
   public async search(query: string): Promise<SearchResult3["searchResult3"]> {
@@ -194,13 +284,45 @@ export class SubsonicClient {
         artist: DEMO_ARTISTS.filter((a) => a.name.toLowerCase().includes(q)),
       };
     }
-    const res = await this.request<SearchResult3>("search3", {
-      query,
-      songCount: 20,
-      albumCount: 15,
-      artistCount: 10,
-    });
-    return res.searchResult3 || {};
+    try {
+      const res = await this.request<SearchResult3>("search3", {
+        query,
+        songCount: 20,
+        albumCount: 15,
+        artistCount: 10,
+      });
+      return res.searchResult3 || {};
+    } catch (err) {
+      console.warn("[SubsonicClient] Remote search failed, falling back to cached DB:", err);
+      try {
+        const { db } = await import("../db/dexie");
+        const q = query.toLowerCase();
+        const cachedTracks = await db.cachedTracks.toArray();
+        const cachedAlbums = await db.cachedAlbums.toArray();
+        const matchedSongs = cachedTracks
+          .map((t) => t.song)
+          .filter(
+            (s) =>
+              s.title?.toLowerCase().includes(q) ||
+              s.artist?.toLowerCase().includes(q) ||
+              s.album?.toLowerCase().includes(q)
+          );
+        const matchedAlbums = cachedAlbums
+          .map((a) => a.album)
+          .filter(
+            (a) =>
+              a.name?.toLowerCase().includes(q) ||
+              a.artist?.toLowerCase().includes(q)
+          );
+        return {
+          song: matchedSongs,
+          album: matchedAlbums,
+          artist: [],
+        };
+      } catch {
+        return {};
+      }
+    }
   }
 
   public async getGenres(): Promise<Genre[]> {

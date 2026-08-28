@@ -7,6 +7,8 @@ import { Artist } from "../../../lib/subsonic/types";
 import { subsonicClient } from "../../../lib/subsonic/client";
 import { AlbumCard } from "../../../components/shared/AlbumCard";
 
+import { getOfflineArtist, isBrowserOffline } from "../../../lib/db/offlineProvider";
+
 export default function ArtistDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [artist, setArtist] = useState<Artist | null>(null);
@@ -15,13 +17,25 @@ export default function ArtistDetailPage({ params }: { params: Promise<{ id: str
 
   useEffect(() => {
     setLoading(true);
+
+    if (isBrowserOffline()) {
+      getOfflineArtist(id)
+        .then(setArtist)
+        .finally(() => setLoading(false));
+      return;
+    }
+
     subsonicClient
       .getArtist(id)
       .then((data) => {
         setArtist(data);
         setIsStarred(Boolean(data.starred));
       })
-      .catch((err) => console.error("Error fetching artist:", err))
+      .catch(async (err) => {
+        console.warn("Online artist detail failed, fallback to offline:", err);
+        const offArtist = await getOfflineArtist(id);
+        setArtist(offArtist);
+      })
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -45,6 +59,7 @@ export default function ArtistDetailPage({ params }: { params: Promise<{ id: str
     );
   }
 
+  const [imgError, setImgError] = useState(false);
   const imageUrl = artist.artistImageUrl || (artist.coverArt ? subsonicClient.getCoverArtUrl(artist.coverArt, 400) : null);
   const albums = artist.album || [];
 
@@ -67,12 +82,19 @@ export default function ArtistDetailPage({ params }: { params: Promise<{ id: str
       {/* Header Profile */}
       <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 pb-6 border-b border-zinc-800">
         <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden bg-zinc-800 shadow-2xl shrink-0 border-4 border-zinc-800">
-          {imageUrl ? (
+          {imageUrl && !imgError ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={imageUrl} alt={artist.name} className="w-full h-full object-cover" />
+            <img
+              src={imageUrl}
+              alt={artist.name}
+              onError={() => setImgError(true)}
+              className="w-full h-full object-cover"
+            />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-zinc-600">
-              <User size={64} />
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-900 text-white">
+              <span className="text-4xl font-extrabold tracking-wider">
+                {artist.name.slice(0, 2).toUpperCase()}
+              </span>
             </div>
           )}
         </div>

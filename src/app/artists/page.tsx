@@ -4,23 +4,44 @@ import { useEffect, useState } from "react";
 import { Artist } from "../../lib/subsonic/types";
 import { subsonicClient } from "../../lib/subsonic/client";
 import { ArtistCard } from "../../components/shared/ArtistCard";
-import { Users, Search } from "lucide-react";
+import { Users, Search, WifiOff } from "lucide-react";
+import { getOfflineArtists, isBrowserOffline } from "../../lib/db/offlineProvider";
 
 export default function ArtistsPage() {
   const [artists, setArtists] = useState<Artist[]>([]);
   const [filteredArtists, setFilteredArtists] = useState<Artist[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [isOffline, setIsOffline] = useState(false);
 
   useEffect(() => {
     setLoading(true);
+
+    if (isBrowserOffline()) {
+      setIsOffline(true);
+      getOfflineArtists()
+        .then((list) => {
+          setArtists(list);
+          setFilteredArtists(list);
+        })
+        .finally(() => setLoading(false));
+      return;
+    }
+
     subsonicClient
       .getArtists()
       .then((list) => {
         setArtists(list);
         setFilteredArtists(list);
+        setIsOffline(false);
       })
-      .catch((err) => console.error("Error fetching artists:", err))
+      .catch(async (err) => {
+        console.warn("Online artists failed, fallback to offline:", err);
+        setIsOffline(true);
+        const offArtists = await getOfflineArtists();
+        setArtists(offArtists);
+        setFilteredArtists(offArtists);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -42,8 +63,19 @@ export default function ArtistsPage() {
             <Users size={24} />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-white">Artisti</h1>
-            <p className="text-xs text-zinc-400">Esplora tutti gli artisti presenti nella tua libreria</p>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl md:text-3xl font-extrabold text-white">Artisti</h1>
+              {isOffline && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/30">
+                  <WifiOff size={11} /> Offline
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-zinc-400">
+              {isOffline
+                ? "Visualizzazione artisti con brani scaricati offline"
+                : "Esplora tutti gli artisti presenti nella tua libreria"}
+            </p>
           </div>
         </div>
 

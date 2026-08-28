@@ -9,7 +9,7 @@ import {
   updateMediaSessionPositionState,
 } from "../lib/audio/mediaSession";
 import { subsonicClient } from "../lib/subsonic/client";
-import { autoCacheTrack, touchTrackPlayed } from "../lib/db/lruCache";
+import { touchTrackPlayed } from "../lib/db/lruCache";
 import { extractColorFromImage, ExtractedColor } from "../lib/utils/colorExtractor";
 import { useSettingsStore } from "./useSettingsStore";
 
@@ -192,12 +192,9 @@ export const usePlayerStore = create<PlayerState>()(
         // Send now-playing scrobble
         subsonicClient.scrobble(song.id, undefined, false);
 
-        // Track in history & auto-cache
+        // Track in history
         touchTrackPlayed(song.id);
-        const { autoCacheStreamed, maxCacheSizeGB, bitrate } = useSettingsStore.getState();
-        if (autoCacheStreamed) {
-          autoCacheTrack(song, maxCacheSizeGB * 1024 * 1024 * 1024);
-        }
+        const { bitrate } = useSettingsStore.getState();
 
         // Extract vibrant background color
         if (song.coverArt) {

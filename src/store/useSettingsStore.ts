@@ -52,7 +52,7 @@ export const useSettingsStore = create<SettingsState>()(
       gaplessEnabled: true,
       replayGainMode: "track",
       autoScrobble: true,
-      autoCacheStreamed: true,
+      autoCacheStreamed: false,
       maxCacheSizeGB: 2,
       equalizerEnabled: false,
       equalizerPreset: "Piatto (Flat)",

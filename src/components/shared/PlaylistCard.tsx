@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { ListMusic, Play } from "lucide-react";
+import { ListMusic, Play, Loader2 } from "lucide-react";
 import { Playlist } from "../../lib/subsonic/types";
 import { subsonicClient } from "../../lib/subsonic/client";
 import { usePlayerStore } from "../../store/usePlayerStore";
+import { useDownloadStore } from "../../store/useDownloadStore";
 
 interface PlaylistCardProps {
   playlist: Playlist;
@@ -12,6 +13,9 @@ interface PlaylistCardProps {
 
 export function PlaylistCard({ playlist }: PlaylistCardProps) {
   const playSong = usePlayerStore((s) => s.playSong);
+  const downloadState = useDownloadStore((s) => s.downloadingItems[playlist.id]);
+  const isDownloading = downloadState?.status === "downloading";
+  const progress = downloadState?.progress || 0;
 
   const coverUrl = playlist.coverArt
     ? subsonicClient.getCoverArtUrl(playlist.coverArt, 300)
@@ -37,6 +41,11 @@ export function PlaylistCard({ playlist }: PlaylistCardProps) {
       className="group relative flex flex-col p-3 rounded-2xl bg-zinc-900/40 hover:bg-zinc-800/60 border border-zinc-800/40 hover:border-zinc-700/60 transition-all duration-300 shadow-lg hover:shadow-2xl"
     >
       <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-zinc-800 shadow-md flex items-center justify-center">
+        {isDownloading && (
+          <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-indigo-500/40 flex items-center gap-1 text-[10px] text-indigo-400 font-bold z-10 shadow-lg">
+            <Loader2 size={11} className="animate-spin" /> {progress}%
+          </div>
+        )}
         {coverUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img

@@ -4,18 +4,37 @@ import { useEffect, useState } from "react";
 import { Playlist } from "../../lib/subsonic/types";
 import { subsonicClient } from "../../lib/subsonic/client";
 import { PlaylistCard } from "../../components/shared/PlaylistCard";
-import { ListMusic } from "lucide-react";
+import { ListMusic, WifiOff } from "lucide-react";
+import { getOfflinePlaylists, isBrowserOffline } from "../../lib/db/offlineProvider";
 
 export default function PlaylistsPage() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isOffline, setIsOffline] = useState(false);
 
   useEffect(() => {
     setLoading(true);
+
+    if (isBrowserOffline()) {
+      setIsOffline(true);
+      getOfflinePlaylists()
+        .then(setPlaylists)
+        .finally(() => setLoading(false));
+      return;
+    }
+
     subsonicClient
       .getPlaylists()
-      .then(setPlaylists)
-      .catch((err) => console.error("Error fetching playlists:", err))
+      .then((data) => {
+        setPlaylists(data);
+        setIsOffline(false);
+      })
+      .catch(async (err) => {
+        console.warn("Online playlists failed, fallback to offline:", err);
+        setIsOffline(true);
+        const offPlaylists = await getOfflinePlaylists();
+        setPlaylists(offPlaylists);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -28,8 +47,19 @@ export default function PlaylistsPage() {
             <ListMusic size={24} />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-white">Playlist</h1>
-            <p className="text-xs text-zinc-400">Le tue playlist personali sincronizzate con Navidrome</p>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl md:text-3xl font-extrabold text-white">Playlist</h1>
+              {isOffline && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/30">
+                  <WifiOff size={11} /> Offline
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-zinc-400">
+              {isOffline
+                ? "Visualizzazione playlist salvate offline sul dispositivo"
+                : "Le tue playlist personali sincronizzate con Navidrome"}
+            </p>
           </div>
         </div>
       </div>

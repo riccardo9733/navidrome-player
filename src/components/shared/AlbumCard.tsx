@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Play } from "lucide-react";
+import { Play, Loader2 } from "lucide-react";
 import { Album } from "../../lib/subsonic/types";
 import { subsonicClient } from "../../lib/subsonic/client";
 import { usePlayerStore } from "../../store/usePlayerStore";
+import { useDownloadStore } from "../../store/useDownloadStore";
 
 interface AlbumCardProps {
   album: Album;
@@ -12,6 +13,9 @@ interface AlbumCardProps {
 
 export function AlbumCard({ album }: AlbumCardProps) {
   const playSong = usePlayerStore((s) => s.playSong);
+  const downloadState = useDownloadStore((s) => s.downloadingItems[album.id]);
+  const isDownloading = downloadState?.status === "downloading";
+  const progress = downloadState?.progress || 0;
 
   const coverUrl = album.coverArt
     ? subsonicClient.getCoverArtUrl(album.coverArt, 400)
@@ -38,6 +42,12 @@ export function AlbumCard({ album }: AlbumCardProps) {
     >
       {/* Cover Image Container */}
       <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-zinc-800 shadow-md">
+        {isDownloading && (
+          <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-indigo-500/40 flex items-center gap-1 text-[10px] text-indigo-400 font-bold z-10 shadow-lg">
+            <Loader2 size={11} className="animate-spin" /> {progress}%
+          </div>
+        )}
+
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={coverUrl}

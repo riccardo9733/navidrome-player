@@ -10,6 +10,8 @@ import { useAuthStore } from "../store/useAuthStore";
 import { AlbumCard } from "../components/shared/AlbumCard";
 import { PlaylistCard } from "../components/shared/PlaylistCard";
 import { TrackRow } from "../components/shared/TrackRow";
+import { getOfflineAlbums, getOfflinePlaylists, getOfflineTracks, isBrowserOffline } from "../lib/db/offlineProvider";
+import { WifiOff } from "lucide-react";
 
 export default function HomePage() {
   const isConnected = useAuthStore((s) => s.isConnected);
@@ -19,10 +21,34 @@ export default function HomePage() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [topSongs, setTopSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isOffline, setIsOffline] = useState(false);
+
+  const loadOfflineData = async () => {
+    try {
+      const [offlineAlbums, offlinePlaylists, offlineTracks] = await Promise.all([
+        getOfflineAlbums(),
+        getOfflinePlaylists(),
+        getOfflineTracks(),
+      ]);
+      setAlbums(offlineAlbums.slice(0, 8));
+      setPlaylists(offlinePlaylists.slice(0, 4));
+      setTopSongs(offlineTracks.slice(0, 6));
+      setIsOffline(true);
+    } catch (e) {
+      console.error("Error loading offline home data:", e);
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
+
+    if (isBrowserOffline()) {
+      loadOfflineData().finally(() => {
+        if (isMounted) setLoading(false);
+      });
+      return;
+    }
 
     Promise.all([
       subsonicClient.getAlbumList("recent", 8),
@@ -32,6 +58,7 @@ export default function HomePage() {
         if (!isMounted) return;
         setAlbums(albumsList);
         setPlaylists(playlistsList.slice(0, 4));
+        setIsOffline(false);
 
         // Get top songs from first album or search
         if (albumsList.length > 0) {
@@ -45,7 +72,12 @@ export default function HomePage() {
           }
         }
       })
-      .catch((err) => console.error("Error loading home data:", err))
+      .catch(async (err) => {
+        console.warn("Online home data failed, falling back to offline storage:", err);
+        if (isMounted) {
+          await loadOfflineData();
+        }
+      })
       .finally(() => {
         if (isMounted) setLoading(false);
       });
@@ -66,8 +98,15 @@ export default function HomePage() {
       {/* 1. Hero Welcome Banner */}
       <div className="relative overflow-hidden rounded-3xl p-8 md:p-12 bg-gradient-to-r from-indigo-950 via-purple-950/60 to-zinc-900 border border-indigo-500/20 shadow-2xl">
         <div className="relative z-10 max-w-xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold border border-indigo-500/30">
-            <Sparkles size={14} /> Benvenuto nel tuo Navidrome Player
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold border border-indigo-500/30">
+              <Sparkles size={14} /> Benvenuto nel tuo Navidrome Player
+            </div>
+            {isOffline && (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/30">
+                <WifiOff size={13} /> Libreria Offline
+              </div>
+            )}
           </div>
 
           <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">

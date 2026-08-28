@@ -12,6 +12,8 @@ import {
   ShieldCheck,
   Radio,
   Loader2,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useSettingsStore } from "../../store/useSettingsStore";
@@ -26,6 +28,8 @@ export default function SettingsPage() {
   const setActiveProfile = useAuthStore((s) => s.setActiveProfile);
   const testConnection = useAuthStore((s) => s.testConnection);
   const isConnected = useAuthStore((s) => s.isConnected);
+  const isOfflineMode = useAuthStore((s) => s.isOfflineMode);
+  const toggleOfflineMode = useAuthStore((s) => s.toggleOfflineMode);
   const serverInfo = useAuthStore((s) => s.serverInfo);
 
   // Settings store
@@ -51,6 +55,8 @@ export default function SettingsPage() {
   const [legacyAuth, setLegacyAuth] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [testResult, setTestResult] = useState<{ success?: boolean; error?: string } | null>(null);
+
+  const activeProfile = profiles.find((p) => p.id === activeProfileId);
 
   const handleAddServer = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,11 +93,76 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-10 max-w-4xl mx-auto animate-in fade-in duration-300 pb-12">
+    <div className="space-y-8 max-w-4xl mx-auto animate-in fade-in duration-300 pb-12">
       {/* Header */}
       <div className="pb-4 border-b border-zinc-800">
         <h1 className="text-2xl md:text-3xl font-extrabold text-white">Impostazioni</h1>
         <p className="text-xs text-zinc-400">Configurazione server Navidrome, qualità audio, equalizzatore e cache</p>
+      </div>
+
+      {/* Live Server Status Card */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 backdrop-blur-xl shadow-lg space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div
+              className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
+                isOfflineMode
+                  ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                  : isConnected && activeProfile
+                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                  : "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
+              }`}
+            >
+              {isOfflineMode ? (
+                <WifiOff size={20} />
+              ) : isConnected && activeProfile ? (
+                <ShieldCheck size={20} />
+              ) : (
+                <Server size={20} />
+              )}
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-white">Stato Connessione:</span>
+                {isOfflineMode ? (
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold">
+                    Offline Mode
+                  </span>
+                ) : isConnected && activeProfile ? (
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Connesso a {activeProfile.name}
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold">
+                    Demo Mode (Nessun server)
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-zinc-400 mt-0.5">
+                {isOfflineMode
+                  ? "Riproduzione abilitata solo per i brani e album scaricati in locale"
+                  : activeProfile
+                  ? `Server: ${activeProfile.url} (Utente: ${activeProfile.username})`
+                  : "Nessun server Navidrome configurato. Aggiungine uno qui sotto per accedere alla tua musica."}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <button
+              onClick={() => toggleOfflineMode()}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                isOfflineMode
+                  ? "bg-amber-500 text-black border-amber-400 font-bold"
+                  : "bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 border-zinc-700"
+              }`}
+            >
+              {isOfflineMode ? <Wifi size={14} /> : <WifiOff size={14} />}
+              {isOfflineMode ? "Torna Online" : "Modalità Offline"}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* 1. Server Configuration Section */}

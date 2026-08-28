@@ -10,26 +10,67 @@ import { TrackRow } from "../../../components/shared/TrackRow";
 import { formatDuration } from "../../../lib/utils/formatters";
 import { downloadAlbum } from "../../../lib/db/downloadManager";
 
+import { getOfflineAlbum, isBrowserOffline } from "../../../lib/db/offlineProvider";
+import { isTrackDownloaded } from "../../../lib/db/downloadManager";
+import { useDownloadStore } from "../../../store/useDownloadStore";
+
 export default function AlbumDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [album, setAlbum] = useState<Album | null>(null);
   const [loading, setLoading] = useState(true);
-  const [downloading, setDownloading] = useState(false);
-  const [downloadProgress, setDownloadProgress] = useState(0);
   const [isDownloaded, setIsDownloaded] = useState(false);
   const [isStarred, setIsStarred] = useState(false);
+
+  const downloadState = useDownloadStore((s) => s.downloadingItems[id]);
+  const downloadAlbumAction = useDownloadStore((s) => s.downloadAlbumAction);
+  const isDownloading = downloadState?.status === "downloading";
+  const downloadProgress = downloadState?.progress || 0;
 
   const playSong = usePlayerStore((s) => s.playSong);
 
   useEffect(() => {
+    if (downloadState?.status === "completed") {
+      setIsDownloaded(true);
+    }
+  }, [downloadState?.status]);
+
+  useEffect(() => {
     setLoading(true);
+
+    if (isBrowserOffline()) {
+      getOfflineAlbum(id)
+        .then((data) => {
+          if (data) {
+            setAlbum(data);
+            setIsDownloaded(true);
+          }
+        })
+        .finally(() => setLoading(false));
+      return;
+    }
+
     subsonicClient
       .getAlbum(id)
-      .then((data) => {
+      .then(async (data) => {
         setAlbum(data);
         setIsStarred(Boolean(data.starred));
+
+        // Check if all songs are already downloaded
+        if (data.song && data.song.length > 0) {
+          const downloadChecks = await Promise.all(
+            data.song.map((s) => isTrackDownloaded(s.id))
+          );
+          setIsDownloaded(downloadChecks.every(Boolean));
+        }
       })
-      .catch((err) => console.error("Error loading album:", err))
+      .catch(async (err) => {
+        console.warn("Online album detail failed, fallback to offline:", err);
+        const offAlbum = await getOfflineAlbum(id);
+        if (offAlbum) {
+          setAlbum(offAlbum);
+          setIsDownloaded(true);
+        }
+      })
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -71,19 +112,9 @@ export default function AlbumDetailPage({ params }: { params: Promise<{ id: stri
     }
   };
 
-  const handleDownloadAlbum = async () => {
-    if (downloading || isDownloaded) return;
-    setDownloading(true);
-    try {
-      await downloadAlbum(album, (completed, total) => {
-        setDownloadProgress(Math.round((completed / total) * 100));
-      });
-      setIsDownloaded(true);
-    } catch (err) {
-      console.error("Failed to download album:", err);
-    } finally {
-      setDownloading(false);
-    }
+  const handleDownloadAlbum = () => {
+    if (isDownloading || isDownloaded || !album) return;
+    downloadAlbumAction(album);
   };
 
   const handleStarToggle = async () => {
@@ -161,7 +192,7 @@ export default function AlbumDetailPage({ params }: { params: Promise<{ id: stri
               className={`flex items-center gap-2 px-4 py-3 rounded-full border text-sm font-semibold transition-colors ${
                 isDownloaded
                   ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                  : downloading
+                  : isDownloading
                   ? "bg-indigo-500/10 border-indigo-500/20 text-indigo-400 animate-pulse"
                   : "bg-zinc-900 border-zinc-800 hover:bg-zinc-800 text-zinc-300"
               }`}
@@ -170,7 +201,7 @@ export default function AlbumDetailPage({ params }: { params: Promise<{ id: stri
                 <>
                   <Check size={16} /> Scaricato
                 </>
-              ) : downloading ? (
+              ) : isDownloading ? (
                 <>
                   <Loader2 size={16} className="animate-spin" /> {downloadProgress}%
                 </>

@@ -4,19 +4,38 @@ import { useEffect, useState } from "react";
 import { Album } from "../../lib/subsonic/types";
 import { subsonicClient } from "../../lib/subsonic/client";
 import { AlbumCard } from "../../components/shared/AlbumCard";
-import { Disc3, Filter } from "lucide-react";
+import { Disc3, Filter, WifiOff } from "lucide-react";
+import { getOfflineAlbums, isBrowserOffline } from "../../lib/db/offlineProvider";
 
 export default function AlbumsPage() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortType, setSortType] = useState<"recent" | "frequent" | "newest" | "alphabeticalByName">("recent");
+  const [isOffline, setIsOffline] = useState(false);
 
   useEffect(() => {
     setLoading(true);
+
+    if (isBrowserOffline()) {
+      setIsOffline(true);
+      getOfflineAlbums()
+        .then(setAlbums)
+        .finally(() => setLoading(false));
+      return;
+    }
+
     subsonicClient
       .getAlbumList(sortType, 40)
-      .then(setAlbums)
-      .catch((err) => console.error("Error fetching albums:", err))
+      .then((data) => {
+        setAlbums(data);
+        setIsOffline(false);
+      })
+      .catch(async (err) => {
+        console.warn("Online albums failed, fallback to offline:", err);
+        setIsOffline(true);
+        const offAlbums = await getOfflineAlbums();
+        setAlbums(offAlbums);
+      })
       .finally(() => setLoading(false));
   }, [sortType]);
 
@@ -29,8 +48,19 @@ export default function AlbumsPage() {
             <Disc3 size={24} />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-white">Album</h1>
-            <p className="text-xs text-zinc-400">Esplora la collezione completa dei tuoi dischi</p>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl md:text-3xl font-extrabold text-white">Album</h1>
+              {isOffline && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/30">
+                  <WifiOff size={11} /> Offline
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-zinc-400">
+              {isOffline
+                ? "Visualizzazione album con tracce scaricate offline"
+                : "Esplora la collezione completa dei tuoi dischi"}
+            </p>
           </div>
         </div>
 

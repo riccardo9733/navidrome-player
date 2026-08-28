@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Heart, Disc3, Users, Music2 } from "lucide-react";
+import { Heart, Disc3, Users, Music2, WifiOff } from "lucide-react";
 import { Song, Album, Artist } from "../../lib/subsonic/types";
 import { subsonicClient } from "../../lib/subsonic/client";
 import { TrackRow } from "../../components/shared/TrackRow";
 import { AlbumCard } from "../../components/shared/AlbumCard";
 import { ArtistCard } from "../../components/shared/ArtistCard";
+import { getOfflineAlbums, getOfflineArtists, getOfflineTracks, isBrowserOffline } from "../../lib/db/offlineProvider";
 
 type StarredTab = "songs" | "albums" | "artists";
 
@@ -16,17 +17,43 @@ export default function StarredPage() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [artists, setArtists] = useState<Artist[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isOffline, setIsOffline] = useState(false);
 
   useEffect(() => {
     setLoading(true);
+
+    if (isBrowserOffline()) {
+      setIsOffline(true);
+      Promise.all([getOfflineTracks(), getOfflineAlbums(), getOfflineArtists()])
+        .then(([allTracks, allAlbums, allArtists]) => {
+          setSongs(allTracks.filter((t) => t.starred));
+          setAlbums(allAlbums.filter((a) => a.starred));
+          setArtists(allArtists.filter((a) => a.starred));
+        })
+        .finally(() => setLoading(false));
+      return;
+    }
+
     subsonicClient
       .getStarred()
       .then((data) => {
         setSongs(data.song);
         setAlbums(data.album);
         setArtists(data.artist);
+        setIsOffline(false);
       })
-      .catch((err) => console.error("Error fetching starred:", err))
+      .catch(async (err) => {
+        console.warn("Online starred failed, fallback to offline:", err);
+        setIsOffline(true);
+        const [allTracks, allAlbums, allArtists] = await Promise.all([
+          getOfflineTracks(),
+          getOfflineAlbums(),
+          getOfflineArtists(),
+        ]);
+        setSongs(allTracks.filter((t) => t.starred));
+        setAlbums(allAlbums.filter((a) => a.starred));
+        setArtists(allArtists.filter((a) => a.starred));
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -39,8 +66,19 @@ export default function StarredPage() {
             <Heart size={24} className="fill-current" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-white">I Tuoi Preferiti</h1>
-            <p className="text-xs text-zinc-400">Tutti i brani, album e artisti contrassegnati con la stella</p>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl md:text-3xl font-extrabold text-white">I Tuoi Preferiti</h1>
+              {isOffline && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/30">
+                  <WifiOff size={11} /> Offline
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-zinc-400">
+              {isOffline
+                ? "Visualizzazione preferiti tra i brani salvati offline"
+                : "Tutti i brani, album e artisti contrassegnati con la stella"}
+            </p>
           </div>
         </div>
 
