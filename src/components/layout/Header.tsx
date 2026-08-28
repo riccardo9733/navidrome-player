@@ -388,7 +388,7 @@ export function Header() {
   const router = useRouter();
 
   return (
-    <header className="flex h-14 md:h-16 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl px-3 md:px-6 items-center justify-between z-40 shrink-0 select-none relative gap-2">
+    <header className="flex pt-[env(safe-area-inset-top,0px)] h-[calc(3.5rem+env(safe-area-inset-top,0px))] md:h-16 md:pt-0 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl px-3 md:px-6 items-center justify-between z-40 shrink-0 select-none relative gap-2">
       {/* Left: Mobile Brand / Desktop Navigation Arrows */}
       <div className="flex items-center gap-2">
         {/* Mobile Brand Logo */}

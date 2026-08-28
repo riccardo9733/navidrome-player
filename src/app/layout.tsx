@@ -37,6 +37,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -46,7 +47,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it" className="dark">
-      <body className="bg-[#08090d] text-zinc-100 antialiased h-screen overflow-hidden flex flex-col">
+      <body className="bg-[#08090d] text-zinc-100 antialiased h-[100dvh] overflow-hidden flex flex-col">
         <AudioProvider>
           <div className="flex flex-1 overflow-hidden">
             {/* Desktop Left Sidebar */}
@@ -55,7 +56,7 @@ export default function RootLayout({
             {/* Main Content Area */}
             <div className="flex-1 flex flex-col overflow-hidden">
               <Header />
-              <main className="flex-1 overflow-y-auto pb-36 md:pb-28 px-4 md:px-8 py-6">
+              <main className="flex-1 overflow-y-auto px-4 md:px-8 pt-3 pb-36 md:pt-6 md:pb-28">
                 {children}
               </main>
             </div>
