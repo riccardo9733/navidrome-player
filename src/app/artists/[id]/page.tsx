@@ -92,10 +92,8 @@ export default function ArtistDetailPage({ params }: { params: Promise<{ id: str
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-primary/30 to-secondary text-primary">
-              <span className="text-4xl font-extrabold tracking-wider">
-                {artist.name.slice(0, 2).toUpperCase()}
-              </span>
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-primary/15 via-primary/8 to-secondary text-primary">
+              <User className="w-20 h-20 md:w-24 md:h-24 text-primary" strokeWidth={1.5} />
             </div>
           )}
         </div>
