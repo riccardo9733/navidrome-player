@@ -181,7 +181,7 @@ export function FullscreenPlayerModal() {
                     : "text-zinc-400 hover:text-white"
                 }`}
               >
-                <ListMusic size={14} /> Coda ({queue.length})
+                <ListMusic size={14} /> Coda
               </button>
               <button
                 onClick={() => setActiveTab("equalizer")}
