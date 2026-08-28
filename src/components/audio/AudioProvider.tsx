@@ -22,10 +22,15 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     initializeAuth();
 
     // 3. Register PWA Service Worker
-    if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") {
-      navigator.serviceWorker.register("/sw.js").catch((err) => {
-        console.warn("[SW] Registration failed:", err);
-      });
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((reg) => {
+          reg.update().catch(() => {});
+        })
+        .catch((err) => {
+          console.warn("[SW] Registration failed:", err);
+        });
     }
 
     // 4. Listen for network changes

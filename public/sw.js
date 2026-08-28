@@ -1,21 +1,30 @@
-const CACHE_NAME = "navidrome-pwa-v3";
-const COVERS_CACHE = "navidrome-covers-v3";
-const STATIC_ASSETS = [
+const CACHE_NAME = "navidrome-pwa-v4";
+const COVERS_CACHE = "navidrome-covers-v4";
+
+const STATIC_SHELL_ASSETS = [
   "/",
   "/manifest.json",
   "/icons/icon-192.svg",
   "/icons/icon-512.svg",
 ];
 
+// Pre-cache App Shell and essential manifest & icons on install
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
+    caches.open(CACHE_NAME).then(async (cache) => {
+      for (const asset of STATIC_SHELL_ASSETS) {
+        try {
+          await cache.add(asset);
+        } catch (err) {
+          console.warn("[SW] Precaching error for:", asset, err);
+        }
+      }
     })
   );
   self.skipWaiting();
 });
 
+// Clean up older caches on activate and immediately claim all clients
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -40,30 +49,28 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 2. Never intercept Next.js RSC, Turbopack, HMR or flight streaming requests
+  // 2. Never intercept dev HMR or Next.js internal development hot-reload files
   if (
     url.pathname.startsWith("/_next/webpack-hmr") ||
-    url.pathname.includes("__nextjs") ||
-    url.searchParams.has("_rsc") ||
-    request.headers.get("rsc") === "1" ||
-    request.headers.get("next-router-prefetch") ||
-    request.headers.get("accept")?.includes("text/x-component")
+    url.pathname.includes("__nextjs_original-stack-frame")
   ) {
     return;
   }
 
-  // 3. Do not intercept audio streaming or media range requests
+  // 3. Do not intercept audio media range requests (audio is played via IndexedDB Blob URLs or streaming)
   if (
     request.headers.get("range") ||
     url.pathname.includes("/rest/stream.view") ||
     url.pathname.includes(".mp3") ||
     url.pathname.includes(".flac") ||
-    url.pathname.includes(".opus")
+    url.pathname.includes(".opus") ||
+    url.pathname.includes(".aac") ||
+    url.pathname.includes(".m4a")
   ) {
     return;
   }
 
-  // 4. Handle Cover Art images: Match by cover ID and Cache first / Network fallback
+  // 4. Handle Subsonic Cover Art images: Cache first with canonical cover ID matching
   if (url.pathname.includes("/rest/getCoverArt") || url.pathname.includes("/rest/getCoverArt.view")) {
     const coverId = url.searchParams.get("id");
     const canonicalKey = coverId ? `/cover-art/${encodeURIComponent(coverId)}` : null;
@@ -72,7 +79,6 @@ self.addEventListener("fetch", (event) => {
       (async () => {
         const coverCache = await caches.open(COVERS_CACHE);
 
-        // Helper to find a cached response for this specific cover ID
         const findCached = async () => {
           if (canonicalKey) {
             const byKey = await coverCache.match(canonicalKey);
@@ -94,7 +100,6 @@ self.addEventListener("fetch", (event) => {
           return null;
         };
 
-        // Cache first for fast, persistent covers
         const cached = await findCached();
         if (cached) {
           return cached;
@@ -120,7 +125,58 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 5. Network first for Subsonic REST queries, fallback to json error if offline
+  // 5. Handle Navigation / HTML Document requests (PWA Offline fallback)
+  // When offline, serve cached page or fallback to the pre-cached App Shell ("/")
+  if (
+    request.mode === "navigate" ||
+    (request.headers.get("accept") && request.headers.get("accept").includes("text/html"))
+  ) {
+    event.respondWith(
+      fetch(request)
+        .then((networkRes) => {
+          if (networkRes && networkRes.status === 200) {
+            const clone = networkRes.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return networkRes;
+        })
+        .catch(async () => {
+          const cachedExact = await caches.match(request);
+          if (cachedExact) return cachedExact;
+
+          const cachedShell = await caches.match("/");
+          if (cachedShell) return cachedShell;
+
+          return new Response("Offline", {
+            status: 503,
+            headers: { "Content-Type": "text/plain" },
+          });
+        })
+    );
+    return;
+  }
+
+  // 6. Handle Next.js Static Build Assets (Chunks, JS, CSS, Media)
+  // Next.js hashed files are immutable. Cache-First or Stale-While-Revalidate
+  if (url.pathname.startsWith("/_next/static/")) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        if (cached) {
+          return cached;
+        }
+        return fetch(request).then((networkRes) => {
+          if (networkRes && networkRes.ok) {
+            const clone = networkRes.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return networkRes;
+        });
+      })
+    );
+    return;
+  }
+
+  // 7. Subsonic REST API queries: Network first, JSON error fallback when offline
   if (url.pathname.startsWith("/rest/")) {
     event.respondWith(
       fetch(request).catch(() => {
@@ -133,25 +189,27 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 6. Cache static shell assets only (manifest, favicon, icons, css, fonts)
-  const isStaticAsset =
-    STATIC_ASSETS.includes(url.pathname) ||
-    url.pathname.match(/\.(svg|png|jpg|jpeg|webp|ico|woff|woff2|ttf|css)$/);
+  // 8. Static assets: CSS, JS, fonts, icons, manifest, svg, png, etc.
+  const isStaticFile =
+    STATIC_SHELL_ASSETS.includes(url.pathname) ||
+    url.pathname.match(/\.(svg|png|jpg|jpeg|webp|ico|woff|woff2|ttf|css|js|json)$/i);
 
-  if (isStaticAsset) {
+  if (isStaticFile) {
     event.respondWith(
       caches.match(request).then((cached) => {
-        return (
-          cached ||
-          fetch(request).then((res) => {
-            if (res && res.status === 200 && res.type === "basic") {
-              const clone = res.clone();
+        const fetchPromise = fetch(request)
+          .then((networkRes) => {
+            if (networkRes && networkRes.ok) {
+              const clone = networkRes.clone();
               caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
             }
-            return res;
+            return networkRes;
           })
-        );
+          .catch(() => null);
+
+        return cached || fetchPromise;
       })
     );
+    return;
   }
 });
