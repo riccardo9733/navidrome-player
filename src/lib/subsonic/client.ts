@@ -60,7 +60,8 @@ export class SubsonicClient {
 
   private async request<T = unknown>(
     endpoint: string,
-    params: Record<string, string | number | boolean | undefined> = {}
+    params: Record<string, string | number | boolean | undefined> = {},
+    options?: { silent?: boolean }
   ): Promise<T> {
     if (!this.isConfigured()) {
       throw new Error("Subsonic client is not configured with an active server");
@@ -89,8 +90,10 @@ export class SubsonicClient {
 
       return subResponse as unknown as T;
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.warn(`[SubsonicClient] Request to ${endpoint} failed:`, message);
+      if (!options?.silent) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.warn(`[SubsonicClient] Request to ${endpoint} failed:`, message);
+      }
       throw err;
     }
   }
@@ -238,6 +241,81 @@ export class SubsonicClient {
       } catch {
         return [];
       }
+    }
+  }
+
+  public async getRandomSongs(size = 30, genre?: string): Promise<Song[]> {
+    if (!this.isConfigured()) {
+      try {
+        const { db } = await import("../db/dexie");
+        const cachedTracks = await db.cachedTracks.toArray();
+        let songs = cachedTracks.map((t) => t.song);
+        if (genre) {
+          songs = songs.filter((s) => s.genre?.toLowerCase() === genre.toLowerCase());
+        }
+        return songs.sort(() => Math.random() - 0.5).slice(0, size);
+      } catch {
+        return [];
+      }
+    }
+    try {
+      const params: Record<string, string | number> = { size };
+      if (genre) params.genre = genre;
+      const res = await this.request<{ randomSongs?: { song?: Song[] } }>("getRandomSongs", params);
+      return res.randomSongs?.song || [];
+    } catch (err) {
+      console.warn("[SubsonicClient] Remote getRandomSongs failed, fallback to local cache:", err);
+      try {
+        const { db } = await import("../db/dexie");
+        const cachedTracks = await db.cachedTracks.toArray();
+        let songs = cachedTracks.map((t) => t.song);
+        if (genre) {
+          songs = songs.filter((s) => s.genre?.toLowerCase() === genre.toLowerCase());
+        }
+        return songs.sort(() => Math.random() - 0.5).slice(0, size);
+      } catch {
+        return [];
+      }
+    }
+  }
+
+  public async getSongs(size = 500): Promise<Song[]> {
+    if (!this.isConfigured()) {
+      try {
+        const { db } = await import("../db/dexie");
+        const cachedTracks = await db.cachedTracks.toArray();
+        return cachedTracks.map((t) => t.song);
+      } catch {
+        return [];
+      }
+    }
+    try {
+      const res = await this.request<SearchResult3>("search3", {
+        query: "",
+        songCount: size,
+      });
+      if (res.searchResult3?.song && res.searchResult3.song.length > 0) {
+        return res.searchResult3.song;
+      }
+    } catch {
+      // ignore and try getRandomSongs
+    }
+
+    try {
+      const res = await this.request<{ randomSongs?: { song?: Song[] } }>("getRandomSongs", { size });
+      if (res.randomSongs?.song && res.randomSongs.song.length > 0) {
+        return res.randomSongs.song;
+      }
+    } catch {
+      // ignore
+    }
+
+    try {
+      const { db } = await import("../db/dexie");
+      const cachedTracks = await db.cachedTracks.toArray();
+      return cachedTracks.map((t) => t.song);
+    } catch {
+      return [];
     }
   }
 
@@ -434,14 +512,18 @@ export class SubsonicClient {
     }
   }
 
-  public async getLyrics(songId: string): Promise<{ syncedLyrics?: string; plainLyrics?: string }> {
+  public async getLyrics(songId: string, artist?: string, title?: string): Promise<{ syncedLyrics?: string; plainLyrics?: string }> {
     if (!this.isConfigured()) {
       return {};
     }
 
     // Try OpenSubsonic getLyricsBySongId first
     try {
-      const openSubsonicRes = await this.request<LyricsResponse>("getLyricsBySongId", { id: songId });
+      const openSubsonicRes = await this.request<LyricsResponse>(
+        "getLyricsBySongId",
+        { id: songId },
+        { silent: true }
+      );
       const structured = openSubsonicRes.lyricsList?.structuredLyrics?.[0];
       if (structured?.line && structured.line.length > 0) {
         // Convert to LRC string format
@@ -458,7 +540,11 @@ export class SubsonicClient {
     }
 
     try {
-      const plainRes = await this.request<LyricsResponse>("getLyrics", { id: songId });
+      const plainRes = await this.request<LyricsResponse>(
+        "getLyrics",
+        { id: songId, artist, title },
+        { silent: true }
+      );
       if (plainRes.lyrics?.content) {
         // Check if content is LRC formatted
         const content = plainRes.lyrics.content;

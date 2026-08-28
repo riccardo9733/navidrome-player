@@ -20,7 +20,6 @@ import { usePlayerStore } from "../../store/usePlayerStore";
 import { subsonicClient } from "../../lib/subsonic/client";
 import { Song, Album, Artist } from "../../lib/subsonic/types";
 import { formatDuration } from "../../lib/utils/formatters";
-import { QuickThemeSwitcher } from "../theme/QuickThemeSwitcher";
 
 function LiveSearchBarInner() {
   const router = useRouter();
@@ -426,10 +425,8 @@ export function Header() {
         </Suspense>
       </div>
 
-      {/* Right: Quick Theme Switcher & Settings */}
+      {/* Right: Settings */}
       <div className="flex items-center gap-2">
-        <QuickThemeSwitcher />
-
         <Link
           href="/settings"
           className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-secondary/80 hover:bg-secondary border border-border text-foreground/80 hover:text-foreground flex items-center justify-center transition-all shadow-xs active:scale-95 group"

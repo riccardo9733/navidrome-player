@@ -41,7 +41,7 @@ export function SyncedLyrics({ song, className = "", onSeek }: SyncedLyricsProps
     setPlainLyrics(null);
 
     subsonicClient
-      .getLyrics(song.id)
+      .getLyrics(song.id, song.artist, song.title)
       .then((res) => {
         if (!isMounted) return;
         if (res.syncedLyrics) {

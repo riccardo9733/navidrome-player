@@ -9,7 +9,7 @@ export function MobileNav() {
 
   const isMusicActive =
     pathname === "/music" ||
-    pathname.startsWith("/explore") ||
+    pathname.startsWith("/songs") ||
     pathname.startsWith("/albums") ||
     pathname.startsWith("/artists") ||
     pathname.startsWith("/playlists") ||

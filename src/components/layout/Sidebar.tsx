@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Home,
-  Compass,
+  Music2,
   Disc3,
   Users,
   ListMusic,
@@ -33,7 +33,7 @@ export function Sidebar() {
 
   const navLinks = [
     { name: "Home", href: "/", icon: Home },
-    { name: "Esplora", href: "/explore", icon: Compass },
+    { name: "Brani", href: "/songs", icon: Music2 },
     { name: "Cerca", href: "/search", icon: Radio },
     { name: "Album", href: "/albums", icon: Disc3 },
     { name: "Artisti", href: "/artists", icon: Users },

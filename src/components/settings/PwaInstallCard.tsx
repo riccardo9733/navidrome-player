@@ -90,6 +90,11 @@ export function PwaInstallCard() {
     }
   };
 
+  // Do not show the card if already installed as PWA or just installed
+  if (isStandalone || installSuccess) {
+    return null;
+  }
+
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-2.5">

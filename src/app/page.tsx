@@ -230,50 +230,52 @@ export default function HomePage() {
   return (
     <div className="space-y-10 max-w-7xl mx-auto animate-in fade-in duration-300">
       {/* 1. Hero Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl p-8 md:p-12 bg-gradient-to-r from-primary/25 via-card to-card border border-primary/20 shadow-xl">
-        <div className="relative z-10 max-w-xl space-y-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-semibold border border-primary/25">
-              <Sparkles size={14} /> {isOffline ? "Navidrome Player Offline" : "Benvenuto nel tuo Navidrome Player"}
-            </div>
-            {isOffline && (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 text-xs font-semibold border border-amber-500/30">
-                <WifiOff size={13} /> Libreria Offline
+      <div className="relative overflow-hidden rounded-2xl p-5 md:p-6 bg-gradient-to-r from-primary/15 via-card to-card border border-primary/20 shadow-md">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="space-y-1.5 max-w-xl">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/15 text-primary text-[11px] font-semibold border border-primary/25">
+                <Sparkles size={12} /> {isOffline ? "Navidrome Player Offline" : "Benvenuto nel tuo Navidrome Player"}
               </div>
-            )}
+              {isOffline && (
+                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 text-[11px] font-semibold border border-amber-500/30">
+                  <WifiOff size={11} /> Libreria Offline
+                </div>
+              )}
+            </div>
+
+            <h1 className="text-xl md:text-2xl font-bold text-foreground tracking-tight">
+              La tua musica, ovunque sei.
+            </h1>
+
+            <p className="text-xs md:text-sm text-muted-foreground">
+              Streaming lossless in tempo reale, testi sincronizzati LRC ed equalizzatore.
+            </p>
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
-            La tua musica, ovunque sei.
-          </h1>
-
-          <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-            Streaming lossless in tempo reale, testi sincronizzati LRC, equalizzatore a 10 bande e ascolto offline completo.
-          </p>
-
-          <div className="flex flex-wrap items-center gap-4 pt-2">
+          <div className="flex items-center gap-3 shrink-0 pt-1 md:pt-0">
             <button
               onClick={handlePlayHero}
               disabled={topSongs.length === 0}
-              className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-primary text-primary-foreground font-bold text-sm shadow-xl shadow-primary/25 hover:opacity-90 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary text-primary-foreground font-semibold text-xs md:text-sm shadow-md shadow-primary/20 hover:opacity-90 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
-              <Play size={18} className="fill-current" /> Ascolta Ora
+              <Play size={15} className="fill-current" /> Ascolta Ora
             </button>
 
             {!isConnected && (
               <Link
                 href="/settings"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border text-sm font-semibold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-secondary hover:bg-secondary/80 text-secondary-foreground border border-border text-xs md:text-sm font-semibold transition-colors cursor-pointer"
               >
-                <Server size={16} /> Impostazioni Server
+                <Server size={14} /> Impostazioni Server
               </Link>
             )}
           </div>
         </div>
 
         {/* Ambient Gradient Blobs */}
-        <div className="absolute -right-16 -top-16 w-80 h-80 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute right-32 -bottom-20 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -right-10 -top-10 w-48 h-48 bg-primary/15 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute right-24 -bottom-12 w-48 h-48 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
       </div>
 
       {/* 2. Top Songs Section */}
@@ -284,7 +286,7 @@ export default function HomePage() {
               Brani in Primo Piano
             </h2>
             <Link
-              href="/explore"
+              href="/songs"
               className="flex items-center gap-1 text-xs font-semibold text-primary hover:opacity-80 transition-opacity"
             >
               Vedi tutti <ArrowRight size={14} />

@@ -56,6 +56,7 @@ export default function SettingsPage() {
   const [legacyAuth, setLegacyAuth] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [testResult, setTestResult] = useState<{ success?: boolean; error?: string; version?: string } | null>(null);
+  const [isTestingPing, setIsTestingPing] = useState(false);
 
   const activeProfile = profiles.find((p) => p.id === activeProfileId);
 
@@ -88,9 +89,14 @@ export default function SettingsPage() {
   };
 
   const handleTestActiveConnection = async () => {
+    setIsTestingPing(true);
     setTestResult(null);
-    const res = await testConnection();
-    setTestResult(res);
+    try {
+      const res = await testConnection();
+      setTestResult(res);
+    } finally {
+      setIsTestingPing(false);
+    }
   };
 
   return (
@@ -104,18 +110,24 @@ export default function SettingsPage() {
       </div>
 
       {/* Live Server Status Card */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border backdrop-blur-xl shadow-sm space-y-3">
+      <div
+        className={`p-4 sm:p-5 rounded-2xl border backdrop-blur-xl shadow-sm space-y-3 transition-all ${
+          isConnected && activeProfile && !isOfflineMode
+            ? "bg-card border-primary/30 shadow-primary/5"
+            : "bg-card border-border"
+        }`}
+      >
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             <div
-              className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
+              className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-colors shrink-0 ${
                 isOfflineMode
                   ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
                   : isConnected && activeProfile
-                  ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                  ? "bg-primary/10 text-primary border border-primary/20"
                   : activeProfile
-                  ? "bg-red-500/10 text-red-500 border border-red-500/20"
-                  : "bg-primary/10 text-primary border border-primary/20"
+                  ? "bg-destructive/10 text-destructive border border-destructive/20"
+                  : "bg-muted text-muted-foreground border border-border"
               }`}
             >
               {isOfflineMode ? (
@@ -129,28 +141,28 @@ export default function SettingsPage() {
               )}
             </div>
 
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-foreground">Stato Connessione:</span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                <span className="text-sm font-bold text-foreground shrink-0">Stato Connessione:</span>
                 {isOfflineMode ? (
-                  <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 text-xs font-semibold">
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 text-xs font-semibold shrink-0 whitespace-nowrap">
                     Offline Mode
                   </span>
                 ) : isConnected && activeProfile ? (
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 text-xs font-semibold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Connesso a {activeProfile.name}
+                  <span className="px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/20 text-xs font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shrink-0" /> Connesso a {activeProfile.name}
                   </span>
                 ) : activeProfile ? (
-                  <span className="px-2.5 py-0.5 rounded-full bg-destructive/20 text-destructive text-xs font-semibold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-destructive" /> Disconnesso / Non raggiungibile
+                  <span className="px-2.5 py-0.5 rounded-full bg-destructive/20 text-destructive text-xs font-semibold flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                    <span className="w-1.5 h-1.5 rounded-full bg-destructive shrink-0" /> Disconnesso
                   </span>
                 ) : (
-                  <span className="px-2.5 py-0.5 rounded-full bg-secondary text-muted-foreground text-xs font-semibold">
+                  <span className="px-2.5 py-0.5 rounded-full bg-secondary text-muted-foreground text-xs font-semibold shrink-0 whitespace-nowrap">
                     Nessun server configurato
                   </span>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <p className="text-xs text-muted-foreground mt-0.5 truncate">
                 {isOfflineMode
                   ? "Riproduzione abilitata solo per i brani e album scaricati in locale"
                   : isConnected && activeProfile
@@ -162,13 +174,13 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
             <button
               onClick={() => toggleOfflineMode()}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 isOfflineMode
                   ? "bg-amber-500 text-black border-amber-400 font-bold shadow-sm"
-                  : "bg-secondary hover:bg-secondary/80 text-foreground border-border"
+                  : "bg-secondary hover:bg-secondary/80 text-foreground border-border hover:border-primary/30"
               }`}
             >
               {isOfflineMode ? <Wifi size={14} /> : <WifiOff size={14} />}
@@ -178,24 +190,24 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* 1. Theme & Appearance Section (Shadcn Themes & Light/Dark/OLED) */}
-      <ThemeSelector />
-
-      {/* 2. Server Configuration Section */}
+      {/* 1. Server Configuration Section */}
       <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20 shrink-0">
               <Server size={18} />
             </div>
-            <h2 className="text-lg font-bold text-foreground">Server Navidrome / Subsonic</h2>
+            <h2 className="text-base sm:text-lg font-bold text-foreground truncate">
+              Server Navidrome <span className="hidden sm:inline font-normal text-muted-foreground">/ Subsonic</span>
+            </h2>
           </div>
 
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold shadow-sm hover:opacity-90 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold shadow-xs hover:opacity-90 transition-all cursor-pointer shrink-0 whitespace-nowrap"
           >
-            <Plus size={14} /> Aggiungi Server
+            <Plus size={14} className="shrink-0" />
+            <span>Aggiungi Server</span>
           </button>
         </div>
 
@@ -215,43 +227,49 @@ export default function SettingsPage() {
                 <div
                   key={p.id}
                   onClick={() => setActiveProfile(p.id)}
-                  className={`flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all border ${
+                  className={`flex items-center justify-between p-3.5 sm:p-4 rounded-2xl cursor-pointer transition-all border gap-3 ${
                     isActive
-                      ? "bg-primary/10 border-primary shadow-sm ring-1 ring-primary/20"
+                      ? "bg-primary/10 border-primary shadow-xs ring-1 ring-primary/20"
                       : "bg-card border-border hover:bg-secondary/40"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div
-                      className={`w-3 h-3 rounded-full ${
-                        isActive && isConnected ? "bg-emerald-500 shadow-sm" : "bg-muted-foreground/40"
+                      className={`w-3 h-3 rounded-full shrink-0 ${
+                        isActive && isConnected ? "bg-primary shadow-xs ring-2 ring-primary/20" : "bg-muted-foreground/40"
                       }`}
                     />
-                    <div>
-                      <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
-                        {p.name}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-bold text-foreground truncate">
+                          {p.name}
+                        </h4>
                         {isActive && (
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/20 text-primary">
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/20 text-primary shrink-0 whitespace-nowrap">
                             Attivo
                           </span>
                         )}
-                      </h4>
-                      <p className="text-xs text-muted-foreground font-mono mt-0.5">
-                        {p.url} ({p.username})
+                      </div>
+                      <p className="text-xs text-muted-foreground font-mono mt-0.5 truncate">
+                        <span className="text-foreground/70 font-semibold">{p.username}</span>
+                        <span className="mx-1.5 text-muted-foreground/40">•</span>
+                        <span>{p.url.replace(/^https?:\/\//, "")}</span>
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     {isActive && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleTestActiveConnection();
                         }}
-                        className="px-3 py-1 text-xs rounded-lg bg-secondary hover:bg-secondary/80 text-foreground border border-border font-medium cursor-pointer"
+                        disabled={isTestingPing}
+                        className="px-2.5 sm:px-3 py-1.5 text-xs rounded-xl bg-primary/15 hover:bg-primary/25 text-primary border border-primary/30 font-semibold cursor-pointer shrink-0 whitespace-nowrap transition-all active:scale-95 flex items-center gap-1.5 shadow-xs disabled:opacity-50"
                       >
-                        Test Ping
+                        {isTestingPing && <Loader2 size={12} className="animate-spin shrink-0" />}
+                        <span>Test Ping</span>
                       </button>
                     )}
                     <button
@@ -259,7 +277,8 @@ export default function SettingsPage() {
                         e.stopPropagation();
                         removeProfile(p.id);
                       }}
-                      className="p-2 text-muted-foreground hover:text-destructive rounded-lg hover:bg-secondary transition-colors cursor-pointer"
+                      className="p-1.5 sm:p-2 text-muted-foreground hover:text-destructive rounded-xl hover:bg-secondary transition-colors cursor-pointer shrink-0"
+                      title="Elimina server"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -275,7 +294,7 @@ export default function SettingsPage() {
           <div
             className={`flex items-center gap-2 p-3.5 rounded-xl text-xs font-semibold ${
               testResult.success
-                ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                ? "bg-primary/15 border border-primary/30 text-primary"
                 : "bg-destructive/15 border border-destructive/30 text-destructive"
             }`}
           >
@@ -376,6 +395,9 @@ export default function SettingsPage() {
           </form>
         )}
       </section>
+
+      {/* 2. Theme & Appearance Section (Shadcn Themes & Light/Dark/OLED) */}
+      <ThemeSelector />
 
       {/* 3. PWA Mobile & Desktop Section */}
       <PwaInstallCard />
