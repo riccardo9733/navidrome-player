@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Drawer } from "vaul";
 import {
   ChevronDown,
@@ -226,7 +227,29 @@ export function FullscreenPlayerModal() {
                       {currentSong.title}
                     </h2>
                     <p className="text-sm md:text-base text-zinc-400 truncate mt-0.5">
-                      {currentSong.artist || "Artista Sconosciuto"} — {currentSong.album || "Album Sconosciuto"}
+                      {currentSong.artistId ? (
+                        <Link
+                          href={`/artists/${currentSong.artistId}`}
+                          onClick={() => setFullscreenOpen(false)}
+                          className="hover:underline hover:text-zinc-200 text-zinc-300 font-medium"
+                        >
+                          {currentSong.artist || "Artista Sconosciuto"}
+                        </Link>
+                      ) : (
+                        <span>{currentSong.artist || "Artista Sconosciuto"}</span>
+                      )}
+                      {" — "}
+                      {currentSong.albumId ? (
+                        <Link
+                          href={`/albums/${currentSong.albumId}`}
+                          onClick={() => setFullscreenOpen(false)}
+                          className="hover:underline hover:text-zinc-200"
+                        >
+                          {currentSong.album || "Album Sconosciuto"}
+                        </Link>
+                      ) : (
+                        <span>{currentSong.album || "Album Sconosciuto"}</span>
+                      )}
                     </p>
                     <div className="flex items-center gap-2 mt-1.5">
                       {currentSong.bitRate && (

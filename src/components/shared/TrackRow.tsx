@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Play, Pause, Heart, Download, Check, MoreVertical, Music, ListPlus, Radio, Loader2 } from "lucide-react";
+import { Play, Pause, Heart, Download, Check, MoreVertical, Music, ListPlus, Radio, Loader2, User } from "lucide-react";
 import { Song } from "../../lib/subsonic/types";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import { subsonicClient } from "../../lib/subsonic/client";
@@ -141,18 +141,8 @@ export function TrackRow({
         <p className={`text-sm truncate font-medium ${isCurrentTrack ? "text-indigo-400 font-semibold" : "text-white"}`}>
           {song.title}
         </p>
-        <p className="text-xs text-zinc-400 truncate hover:text-zinc-200">
-          {song.artistId ? (
-            <Link
-              href={`/artists/${song.artistId}`}
-              onClick={(e) => e.stopPropagation()}
-              className="hover:underline"
-            >
-              {song.artist || "Artista Sconosciuto"}
-            </Link>
-          ) : (
-            song.artist || "Artista Sconosciuto"
-          )}
+        <p className="text-xs text-zinc-400 truncate">
+          {song.artist || "Artista Sconosciuto"}
         </p>
       </div>
 
@@ -184,7 +174,7 @@ export function TrackRow({
               ? "text-emerald-400 bg-emerald-500/10"
               : isDownloading
               ? "text-indigo-400 opacity-100"
-              : "text-zinc-500 hover:text-zinc-300 opacity-0 group-hover:opacity-100"
+              : "text-zinc-400 md:text-zinc-500 hover:text-zinc-200 opacity-100 md:opacity-0 md:group-hover:opacity-100"
           }`}
         >
           {isDownloaded ? (
@@ -200,14 +190,16 @@ export function TrackRow({
         <button
           onClick={handleStarToggle}
           className={`p-1.5 rounded-lg transition-colors ${
-            isStarred ? "text-pink-500" : "text-zinc-500 hover:text-zinc-300 opacity-0 group-hover:opacity-100"
+            isStarred
+              ? "text-pink-500"
+              : "hidden sm:block text-zinc-500 hover:text-zinc-300 opacity-0 group-hover:opacity-100"
           }`}
         >
           <Heart size={15} className={isStarred ? "fill-current" : ""} />
         </button>
 
         {/* Duration */}
-        <span className="text-xs font-mono text-zinc-500 w-10 text-right">
+        <span className="hidden sm:inline-block text-xs font-mono text-zinc-500 w-10 text-right">
           {formatDuration(song.duration)}
         </span>
 
@@ -218,7 +210,7 @@ export function TrackRow({
               e.stopPropagation();
               setMenuOpen(!menuOpen);
             }}
-            className="p-1.5 text-zinc-500 hover:text-zinc-200 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+            className="p-1.5 text-zinc-400 md:text-zinc-500 hover:text-zinc-200 rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
           >
             <MoreVertical size={16} />
           </button>
@@ -253,6 +245,18 @@ export function TrackRow({
                 >
                   <ListPlus size={14} className="text-indigo-400" /> Aggiungi in coda
                 </button>
+                {song.artistId && (
+                  <Link
+                    href={`/artists/${song.artistId}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-zinc-800 text-left"
+                  >
+                    <User size={14} className="text-indigo-400" /> Vai all&apos;artista
+                  </Link>
+                )}
                 {song.albumId && (
                   <Link
                     href={`/albums/${song.albumId}`}
