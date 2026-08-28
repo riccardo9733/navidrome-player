@@ -1,0 +1,40 @@
+{
+  "name": "Navidrome Player",
+  "short_name": "Navidrome",
+  "description": "Next-generation PWA player for Navidrome / Subsonic with offline listening & synced lyrics",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090a0f",
+  "theme_color": "#090a0f",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "I Miei Download",
+      "short_name": "Download",
+      "description": "Ascolta la musica salvata offline",
+      "url": "/downloads",
+      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Cerca Brani",
+      "short_name": "Cerca",
+      "description": "Cerca nella libreria",
+      "url": "/search",
+      "icons": [{ "src": "/icons/icon-192.svg", "sizes": "192x192" }]
+    }
+  ]
+}
