@@ -129,66 +129,60 @@ export function FullscreenPlayerModal() {
     >
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/80 backdrop-blur-xl z-50 transition-opacity" />
-        <Drawer.Content className="fixed bottom-0 left-0 right-0 max-h-[96vh] h-full flex flex-col z-50 bg-zinc-950 text-white rounded-t-[36px] outline-none overflow-hidden shadow-2xl border-t border-white/10">
+        <Drawer.Content className="fixed bottom-0 left-0 right-0 max-h-[96vh] h-full flex flex-col z-50 bg-background text-foreground rounded-t-[36px] outline-none overflow-hidden shadow-2xl border-t border-border">
           {/* Dynamic Ambient Background Glow */}
-          <div
-            className="ambient-glow"
-            style={{
-              backgroundColor: activeColor?.hex || "#6366f1",
-              opacity: 0.35,
-            }}
-          />
+          <div className="ambient-glow" />
 
           {/* Drawer Handle (Mobile) */}
-          <div className="w-12 h-1.5 bg-zinc-700/80 rounded-full mx-auto mt-3 shrink-0" />
+          <div className="w-12 h-1.5 bg-muted-foreground/30 rounded-full mx-auto mt-3 shrink-0" />
 
           {/* Top Bar / Navigation */}
           <div className="relative z-10 flex items-center justify-between px-6 py-4">
             <button
               onClick={() => setFullscreenOpen(false)}
-              className="p-2 text-zinc-400 hover:text-white rounded-full bg-white/5 hover:bg-white/10 transition-colors"
+              className="p-2 text-muted-foreground hover:text-foreground rounded-full bg-secondary hover:bg-secondary/80 transition-colors cursor-pointer"
             >
               <ChevronDown size={22} />
             </button>
 
             {/* Tab Selector */}
-            <div className="flex items-center gap-1 bg-zinc-900/80 backdrop-blur-md p-1 rounded-full border border-white/5">
+            <div className="flex items-center gap-1 bg-secondary/80 backdrop-blur-md p-1 rounded-full border border-border">
               <button
                 onClick={() => setActiveTab("player")}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === "player"
-                    ? "bg-white text-black shadow-md"
-                    : "text-zinc-400 hover:text-white"
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <Disc3 size={14} /> Brano
               </button>
               <button
                 onClick={() => setActiveTab("lyrics")}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === "lyrics"
-                    ? "bg-white text-black shadow-md"
-                    : "text-zinc-400 hover:text-white"
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <FileText size={14} /> Testo
               </button>
               <button
                 onClick={() => setActiveTab("queue")}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === "queue"
-                    ? "bg-white text-black shadow-md"
-                    : "text-zinc-400 hover:text-white"
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <ListMusic size={14} /> Coda
               </button>
               <button
                 onClick={() => setActiveTab("equalizer")}
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                   activeTab === "equalizer"
-                    ? "bg-white text-black shadow-md"
-                    : "text-zinc-400 hover:text-white"
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <Sliders size={14} /> EQ
@@ -204,14 +198,7 @@ export function FullscreenPlayerModal() {
             {activeTab === "player" && (
               <div className="flex flex-col items-center w-full max-w-md my-auto space-y-6 animate-in fade-in zoom-in-95 duration-300">
                 {/* Artwork */}
-                <div
-                  className="relative w-64 h-64 md:w-80 md:h-80 rounded-3xl overflow-hidden shadow-2xl bg-zinc-900 border border-white/10"
-                  style={{
-                    boxShadow: activeColor
-                      ? `0 25px 50px -12px ${activeColor.rgba(0.5)}`
-                      : "0 25px 50px -12px rgba(0,0,0,0.7)",
-                  }}
-                >
+                <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-3xl overflow-hidden shadow-2xl bg-secondary border border-border">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={coverUrl}
@@ -223,15 +210,15 @@ export function FullscreenPlayerModal() {
                 {/* Track Details & Favorite */}
                 <div className="flex items-center justify-between w-full">
                   <div className="flex flex-col min-w-0 pr-4">
-                    <h2 className="text-xl md:text-2xl font-bold text-white truncate">
+                    <h2 className="text-xl md:text-2xl font-bold text-foreground truncate">
                       {currentSong.title}
                     </h2>
-                    <p className="text-sm md:text-base text-zinc-400 truncate mt-0.5">
+                    <p className="text-sm md:text-base text-muted-foreground truncate mt-0.5">
                       {currentSong.artistId ? (
                         <Link
                           href={`/artists/${currentSong.artistId}`}
                           onClick={() => setFullscreenOpen(false)}
-                          className="hover:underline hover:text-zinc-200 text-zinc-300 font-medium"
+                          className="hover:underline hover:text-foreground text-foreground/80 font-medium"
                         >
                           {currentSong.artist || "Artista Sconosciuto"}
                         </Link>
@@ -243,7 +230,7 @@ export function FullscreenPlayerModal() {
                         <Link
                           href={`/albums/${currentSong.albumId}`}
                           onClick={() => setFullscreenOpen(false)}
-                          className="hover:underline hover:text-zinc-200"
+                          className="hover:underline hover:text-foreground"
                         >
                           {currentSong.album || "Album Sconosciuto"}
                         </Link>
@@ -253,17 +240,17 @@ export function FullscreenPlayerModal() {
                     </p>
                     <div className="flex items-center gap-2 mt-1.5">
                       {currentSong.bitRate && (
-                        <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-mono text-zinc-300">
+                        <span className="px-2 py-0.5 rounded-md bg-secondary text-[10px] font-mono text-muted-foreground border border-border">
                           {currentSong.bitRate} kbps
                         </span>
                       )}
                       {currentSong.suffix && (
-                        <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-mono uppercase text-zinc-300">
+                        <span className="px-2 py-0.5 rounded-md bg-secondary text-[10px] font-mono uppercase text-muted-foreground border border-border">
                           {currentSong.suffix}
                         </span>
                       )}
                       {isDownloaded && (
-                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 text-[10px] font-medium">
+                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-medium border border-primary/20">
                           <Check size={10} /> Offline
                         </span>
                       )}
@@ -273,8 +260,8 @@ export function FullscreenPlayerModal() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={handleDownloadToggle}
-                      className={`p-3 rounded-full bg-white/5 hover:bg-white/10 transition-colors ${
-                        isDownloaded ? "text-emerald-400" : downloading ? "text-indigo-400 animate-pulse" : "text-zinc-400 hover:text-white"
+                      className={`p-3 rounded-full bg-secondary hover:bg-secondary/80 transition-colors cursor-pointer border border-border ${
+                        isDownloaded ? "text-primary" : downloading ? "text-primary animate-pulse" : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       {isDownloaded ? <Check size={20} /> : <Download size={20} />}
@@ -282,8 +269,8 @@ export function FullscreenPlayerModal() {
 
                     <button
                       onClick={handleStarToggle}
-                      className={`p-3 rounded-full bg-white/5 hover:bg-white/10 transition-colors ${
-                        isStarred ? "text-pink-500" : "text-zinc-400 hover:text-white"
+                      className={`p-3 rounded-full bg-secondary hover:bg-secondary/80 transition-colors cursor-pointer border border-border ${
+                        isStarred ? "text-primary bg-primary/10 border-primary/20" : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       <Heart size={20} className={isStarred ? "fill-current" : ""} />
@@ -294,9 +281,9 @@ export function FullscreenPlayerModal() {
                 {/* Seekbar */}
                 <div className="w-full space-y-1.5">
                   <div className="relative flex items-center group py-2">
-                    <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-white rounded-full transition-all"
+                        className="h-full bg-primary rounded-full transition-all"
                         style={{ width: `${progressPercent}%` }}
                       />
                     </div>
@@ -311,7 +298,7 @@ export function FullscreenPlayerModal() {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
+                  <div className="flex items-center justify-between text-xs font-mono text-muted-foreground">
                     <span>{formatDuration(currentTime)}</span>
                     <span>{formatDuration(duration)}</span>
                   </div>
@@ -321,8 +308,8 @@ export function FullscreenPlayerModal() {
                 <div className="flex items-center justify-between w-full px-4">
                   <button
                     onClick={toggleShuffle}
-                    className={`p-2 transition-colors ${
-                      isShuffled ? "text-indigo-400" : "text-zinc-400 hover:text-white"
+                    className={`p-2 transition-colors cursor-pointer ${
+                      isShuffled ? "text-primary bg-primary/10 rounded-xl" : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     <Shuffle size={20} />
@@ -330,29 +317,29 @@ export function FullscreenPlayerModal() {
 
                   <button
                     onClick={previousTrack}
-                    className="p-2 text-zinc-300 hover:text-white transition-colors"
+                    className="p-2 text-foreground/80 hover:text-foreground transition-colors cursor-pointer"
                   >
                     <SkipBack size={28} className="fill-current" />
                   </button>
 
                   <button
                     onClick={togglePlay}
-                    className="w-16 h-16 rounded-full bg-white hover:bg-zinc-200 text-black flex items-center justify-center shadow-2xl transition-transform hover:scale-105 active:scale-95"
+                    className="w-16 h-16 rounded-full bg-primary hover:opacity-90 text-primary-foreground flex items-center justify-center shadow-2xl shadow-primary/30 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
                   >
                     {isPlaying ? <Pause size={28} className="fill-current" /> : <Play size={28} className="ml-1 fill-current" />}
                   </button>
 
                   <button
                     onClick={nextTrack}
-                    className="p-2 text-zinc-300 hover:text-white transition-colors"
+                    className="p-2 text-foreground/80 hover:text-foreground transition-colors cursor-pointer"
                   >
                     <SkipForward size={28} className="fill-current" />
                   </button>
 
                   <button
                     onClick={cycleRepeatMode}
-                    className={`p-2 transition-colors ${
-                      repeatMode !== "off" ? "text-indigo-400" : "text-zinc-400 hover:text-white"
+                    className={`p-2 transition-colors cursor-pointer ${
+                      repeatMode !== "off" ? "text-primary bg-primary/10 rounded-xl" : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {repeatMode === "one" ? <Repeat1 size={20} /> : <Repeat size={20} />}
@@ -361,13 +348,13 @@ export function FullscreenPlayerModal() {
 
                 {/* Volume Slider & Visualizer */}
                 <div className="flex items-center gap-3 w-full px-2">
-                  <button onClick={toggleMute} className="text-zinc-400 hover:text-white">
+                  <button onClick={toggleMute} className="text-muted-foreground hover:text-foreground cursor-pointer">
                     {isMuted || volume === 0 ? <VolumeX size={18} /> : volume < 0.5 ? <Volume1 size={18} /> : <Volume2 size={18} />}
                   </button>
                   <div className="relative flex-1 flex items-center">
-                    <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+                    <div className="w-full h-1 bg-secondary rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-zinc-300 rounded-full"
+                        className="h-full bg-primary rounded-full"
                         style={{ width: `${isMuted ? 0 : volume * 100}%` }}
                       />
                     </div>
@@ -399,10 +386,10 @@ export function FullscreenPlayerModal() {
             {activeTab === "queue" && (
               <div className="w-full h-full flex flex-col animate-in fade-in duration-300 max-h-[65vh] overflow-y-auto space-y-2 pr-1">
                 <div className="flex items-center justify-between mb-3 px-2">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Prossimi in Coda ({queue.length})
                   </span>
-                  <span className="text-xs text-indigo-400 font-medium">
+                  <span className="text-xs text-primary font-medium">
                     {isShuffled ? "Riproduzione Casuale Attiva" : "Ordine Normale"}
                   </span>
                 </div>
@@ -415,24 +402,24 @@ export function FullscreenPlayerModal() {
                       onClick={() => playSong(track, queue, idx)}
                       className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors ${
                         isCur
-                          ? "bg-indigo-600/20 text-indigo-400 border border-indigo-500/30"
-                          : "hover:bg-zinc-900/80 text-zinc-300"
+                          ? "bg-primary/15 text-primary border border-primary/30"
+                          : "hover:bg-secondary text-foreground/90"
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className="text-xs font-mono text-zinc-500 w-5 text-center">
+                        <span className="text-xs font-mono text-muted-foreground w-5 text-center">
                           {isCur ? "▶" : idx + 1}
                         </span>
                         <div className="flex flex-col min-w-0">
-                          <p className={`text-sm font-semibold truncate ${isCur ? "text-indigo-400" : "text-white"}`}>
+                          <p className={`text-sm font-semibold truncate ${isCur ? "text-primary" : "text-foreground"}`}>
                             {track.title}
                           </p>
-                          <p className="text-xs text-zinc-400 truncate">{track.artist}</p>
+                          <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-xs font-mono text-zinc-500">
+                        <span className="text-xs font-mono text-muted-foreground">
                           {formatDuration(track.duration)}
                         </span>
                         <button
@@ -440,7 +427,7 @@ export function FullscreenPlayerModal() {
                             e.stopPropagation();
                             removeFromQueue(idx);
                           }}
-                          className="p-1.5 text-zinc-500 hover:text-red-400 rounded-lg transition-colors"
+                          className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg transition-colors cursor-pointer"
                         >
                           <Trash2 size={15} />
                         </button>
@@ -454,19 +441,19 @@ export function FullscreenPlayerModal() {
             {/* TAB 4: EQUALIZER */}
             {activeTab === "equalizer" && (
               <div className="w-full flex flex-col space-y-6 animate-in fade-in duration-300 max-w-lg">
-                <div className="flex items-center justify-between bg-zinc-900/60 p-4 rounded-2xl border border-white/5">
+                <div className="flex items-center justify-between bg-card p-4 rounded-2xl border border-border shadow-xs">
                   <div className="flex items-center gap-3">
-                    <Sparkles size={20} className="text-indigo-400" />
+                    <Sparkles size={20} className="text-primary" />
                     <div>
-                      <h4 className="text-sm font-bold text-white">Elaborazione Audio</h4>
-                      <p className="text-xs text-zinc-400">Attiva o disattiva i filtri BiQuad</p>
+                      <h4 className="text-sm font-bold text-foreground">Elaborazione Audio</h4>
+                      <p className="text-xs text-muted-foreground">Attiva o disattiva i filtri BiQuad</p>
                     </div>
                   </div>
                   <input
                     type="checkbox"
                     checked={equalizerEnabled}
                     onChange={(e) => setEqualizerEnabled(e.target.checked)}
-                    className="w-5 h-5 accent-indigo-600 rounded cursor-pointer"
+                    className="w-5 h-5 accent-primary rounded cursor-pointer"
                   />
                 </div>
 
@@ -476,10 +463,10 @@ export function FullscreenPlayerModal() {
                     <button
                       key={preset.name}
                       onClick={() => setEqualizerPreset(preset.name)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                         equalizerPreset === preset.name
-                          ? "bg-indigo-600 text-white shadow-lg"
-                          : "bg-zinc-900 text-zinc-400 hover:text-white border border-white/5"
+                          ? "bg-primary text-primary-foreground shadow-sm font-semibold"
+                          : "bg-secondary text-muted-foreground hover:text-foreground border border-border"
                       }`}
                     >
                       {preset.name}
@@ -489,7 +476,7 @@ export function FullscreenPlayerModal() {
 
                 {/* 10 Sliders */}
                 <div
-                  className={`grid grid-cols-10 gap-1 py-4 px-2 bg-zinc-950/80 rounded-2xl border border-zinc-800 ${
+                  className={`grid grid-cols-10 gap-1 py-4 px-2 bg-card rounded-2xl border border-border ${
                     equalizerEnabled ? "opacity-100" : "opacity-40 pointer-events-none"
                   }`}
                 >
@@ -497,7 +484,7 @@ export function FullscreenPlayerModal() {
                     const gain = equalizerGains[index] || 0;
                     return (
                       <div key={label} className="flex flex-col items-center gap-2 h-44 justify-between">
-                        <span className="text-[9px] font-mono text-zinc-400">
+                        <span className="text-[9px] font-mono text-muted-foreground">
                           {gain > 0 ? `+${gain}` : gain}
                         </span>
                         <div className="relative flex items-center justify-center flex-1 w-full">
@@ -508,10 +495,10 @@ export function FullscreenPlayerModal() {
                             step={1}
                             value={gain}
                             onChange={(e) => setEqualizerBandGain(index, parseFloat(e.target.value))}
-                            className="h-28 -rotate-90 w-28 accent-indigo-500"
+                            className="h-28 -rotate-90 w-28 accent-primary cursor-pointer"
                           />
                         </div>
-                        <span className="text-[10px] font-medium text-zinc-500">{label}</span>
+                        <span className="text-[10px] font-medium text-muted-foreground">{label}</span>
                       </div>
                     );
                   })}

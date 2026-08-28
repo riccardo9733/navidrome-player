@@ -21,21 +21,21 @@ export function EqualizerModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-2xl">
+      <div className="relative w-full max-w-2xl bg-card border border-border rounded-2xl p-6 shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-zinc-800">
+        <div className="flex items-center justify-between pb-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20">
               <Sliders size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">Equalizzatore a 10 Bande</h2>
-              <p className="text-xs text-zinc-400">Modella il profilo sonoro in tempo reale con Web Audio API</p>
+              <h2 className="text-lg font-bold text-foreground">Equalizzatore a 10 Bande</h2>
+              <p className="text-xs text-muted-foreground">Modella il profilo sonoro in tempo reale con Web Audio API</p>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-zinc-300">
+            <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-foreground">
               <span>{equalizerEnabled ? "Attivo" : "Disattivato"}</span>
               <input
                 type="checkbox"
@@ -43,12 +43,12 @@ export function EqualizerModal() {
                 onChange={(e) => setEqualizerEnabled(e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600 relative"></div>
+              <div className="w-11 h-6 bg-secondary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary relative"></div>
             </label>
 
             <button
               onClick={() => setEqualizerOpen(false)}
-              className="p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors"
+              className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-secondary transition-colors cursor-pointer"
             >
               <X size={20} />
             </button>
@@ -58,10 +58,10 @@ export function EqualizerModal() {
         {/* Presets Bar */}
         <div className="my-5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Preset Sonori</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Preset Sonori</span>
             <button
               onClick={() => setEqualizerPreset("Piatto (Flat)")}
-              className="flex items-center gap-1 text-xs text-zinc-400 hover:text-indigo-400 transition-colors"
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors cursor-pointer"
             >
               <RotateCcw size={12} /> Reset
             </button>
@@ -71,10 +71,10 @@ export function EqualizerModal() {
               <button
                 key={preset.name}
                 onClick={() => setEqualizerPreset(preset.name)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                   equalizerPreset === preset.name
-                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/25"
-                    : "bg-zinc-800/80 text-zinc-300 hover:bg-zinc-700 border border-zinc-700/50"
+                    ? "bg-primary text-primary-foreground shadow-sm font-semibold"
+                    : "bg-secondary text-muted-foreground hover:text-foreground border border-border"
                 }`}
               >
                 {preset.name}
@@ -85,7 +85,7 @@ export function EqualizerModal() {
 
         {/* 10-Band Sliders */}
         <div
-          className={`grid grid-cols-10 gap-2 py-4 px-2 bg-zinc-950/60 rounded-xl border border-zinc-800/80 transition-opacity ${
+          className={`grid grid-cols-10 gap-2 py-4 px-2 bg-secondary/50 rounded-xl border border-border transition-opacity ${
             equalizerEnabled ? "opacity-100" : "opacity-40 pointer-events-none"
           }`}
         >
@@ -93,7 +93,7 @@ export function EqualizerModal() {
             const gain = equalizerGains[index] || 0;
             return (
               <div key={label} className="flex flex-col items-center gap-3 h-56 justify-between">
-                <span className="text-[10px] font-mono text-zinc-400">
+                <span className="text-[10px] font-mono text-muted-foreground">
                   {gain > 0 ? `+${gain}` : gain}dB
                 </span>
 
@@ -105,11 +105,11 @@ export function EqualizerModal() {
                     step={1}
                     value={gain}
                     onChange={(e) => setEqualizerBandGain(index, parseFloat(e.target.value))}
-                    className="h-36 -rotate-90 w-36 accent-indigo-500"
+                    className="h-36 -rotate-90 w-36 accent-primary cursor-pointer"
                   />
                 </div>
 
-                <span className="text-[10px] font-medium text-zinc-400">{label}</span>
+                <span className="text-[10px] font-medium text-muted-foreground">{label}</span>
               </div>
             );
           })}
@@ -119,7 +119,7 @@ export function EqualizerModal() {
         <div className="mt-6 flex justify-end">
           <button
             onClick={() => setEqualizerOpen(false)}
-            className="px-5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-sm font-medium text-white transition-colors"
+            className="px-5 py-2 rounded-xl bg-secondary hover:bg-secondary/80 text-sm font-medium text-foreground transition-colors cursor-pointer border border-border"
           >
             Chiudi
           </button>

@@ -93,36 +93,36 @@ export function PwaInstallCard() {
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-2.5">
-        <Smartphone size={20} className="text-indigo-400" />
-        <h2 className="text-lg font-bold text-white">App Mobile & Desktop (PWA)</h2>
+        <Smartphone size={20} className="text-primary" />
+        <h2 className="text-lg font-bold text-foreground">App Mobile & Desktop (PWA)</h2>
       </div>
 
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-950/40 via-zinc-900/60 to-zinc-900/40 border border-indigo-500/20 p-6 shadow-xl backdrop-blur-xl space-y-6">
+      <div className="relative overflow-hidden rounded-2xl bg-card border border-border p-6 shadow-sm space-y-6">
         {/* Glow effect */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Top Header info */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 shrink-0">
               <Download size={24} />
             </div>
 
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-base font-bold text-white">Navidrome Web App</h3>
+                <h3 className="text-base font-bold text-foreground">Navidrome Web App</h3>
                 {isStandalone || installSuccess ? (
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     Installata
                   </span>
                 ) : (
-                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold">
+                  <span className="px-2.5 py-0.5 rounded-full bg-primary/15 border border-primary/25 text-primary text-[11px] font-bold">
                     PWA Ready
                   </span>
                 )}
               </div>
-              <p className="text-xs text-zinc-400 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {isStandalone || installSuccess
                   ? "Stai utilizzando Navidrome come applicazione standalone nativa."
                   : "Installa Navidrome su smartphone, tablet o PC per un'esperienza nativa e fluida."}
@@ -137,14 +137,14 @@ export function PwaInstallCard() {
                 <button
                   onClick={handleInstallClick}
                   disabled={isInstalling}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary hover:opacity-90 active:scale-95 text-primary-foreground text-xs font-bold shadow-lg shadow-primary/25 transition-all cursor-pointer"
                 >
                   <Download size={16} />
                   {isInstalling ? "Installazione in corso..." : "Scarica e Installa PWA"}
                 </button>
               ) : isIOS ? (
-                <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-800/80 border border-zinc-700 text-xs font-semibold text-zinc-300">
-                  <Share2 size={15} className="text-indigo-400" />
+                <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-secondary border border-border text-xs font-semibold text-secondary-foreground">
+                  <Share2 size={15} className="text-primary" />
                   <span>Usa Condividi su Safari</span>
                 </div>
               ) : (
@@ -154,9 +154,9 @@ export function PwaInstallCard() {
                       "Per installare l'app:\n• Su Chrome/Edge/Brave: Clicca sull'icona Installa nella barra degli indirizzi in alto a destra o dal menu ⋮ -> 'Installa Navidrome'\n• Su smartphone: Apri il menu del browser e tocca 'Aggiungi a schermata Home' o 'Installa app'"
                     );
                   }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 active:scale-95 text-zinc-200 text-xs font-semibold border border-zinc-700 transition-all cursor-pointer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary hover:bg-secondary/80 active:scale-95 text-secondary-foreground text-xs font-semibold border border-border transition-all cursor-pointer"
                 >
-                  <Download size={15} className="text-indigo-400" />
+                  <Download size={15} className="text-primary" />
                   Come Installare
                 </button>
               )}
@@ -166,37 +166,37 @@ export function PwaInstallCard() {
 
         {/* Features highlights grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-          <div className="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80 flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 shrink-0">
+          <div className="p-3.5 rounded-xl bg-secondary/50 border border-border flex items-start gap-3">
+            <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
               <WifiOff size={16} />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-zinc-200">Ascolto Offline</h4>
-              <p className="text-[11px] text-zinc-400 mt-0.5">
+              <h4 className="text-xs font-bold text-foreground">Ascolto Offline</h4>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
                 Scarica interi album o brani nella memoria del dispositivo e ascoltali senza connessione.
               </p>
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80 flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 shrink-0">
+          <div className="p-3.5 rounded-xl bg-secondary/50 border border-border flex items-start gap-3">
+            <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
               <Headphones size={16} />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-zinc-200">Audio in Background</h4>
-              <p className="text-[11px] text-zinc-400 mt-0.5">
+              <h4 className="text-xs font-bold text-foreground">Audio in Background</h4>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
                 Controlli multimediali integrati nella schermata di blocco, smartwatch e cuffie.
               </p>
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80 flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 shrink-0">
+          <div className="p-3.5 rounded-xl bg-secondary/50 border border-border flex items-start gap-3">
+            <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
               <Sparkles size={16} />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-zinc-200">Esperienza Nativa</h4>
-              <p className="text-[11px] text-zinc-400 mt-0.5">
+              <h4 className="text-xs font-bold text-foreground">Esperienza Nativa</h4>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
                 Avvio istantaneo a schermo intero senza barre del browser e consumo minimo di batteria.
               </p>
             </div>
@@ -205,25 +205,25 @@ export function PwaInstallCard() {
 
         {/* iOS Specific Guidance Banner */}
         {isIOS && !isStandalone && (
-          <div className="p-4 rounded-xl bg-zinc-950/60 border border-indigo-500/30 space-y-2">
-            <div className="flex items-center gap-2 text-xs font-bold text-indigo-300">
+          <div className="p-4 rounded-xl bg-secondary border border-primary/30 space-y-2">
+            <div className="flex items-center gap-2 text-xs font-bold text-primary">
               <Smartphone size={15} />
               Istruzioni per iPhone & iPad (Safari):
             </div>
-            <ol className="text-xs text-zinc-300 space-y-1.5 pl-5 list-decimal">
+            <ol className="text-xs text-foreground/90 space-y-1.5 pl-5 list-decimal">
               <li>
-                Tocca l'icona <span className="font-semibold text-white">Condividi</span> (
-                <Share2 size={13} className="inline mx-0.5 text-indigo-400" />) nella barra di Safari in basso.
+                Tocca l'icona <span className="font-semibold text-foreground">Condividi</span> (
+                <Share2 size={13} className="inline mx-0.5 text-primary" />) nella barra di Safari in basso.
               </li>
               <li>
                 Scorri l'elenco e seleziona{" "}
-                <span className="font-semibold text-white">
-                  "Aggiungi alla schermata Home" <PlusSquare size={13} className="inline mx-0.5 text-indigo-400" />
+                <span className="font-semibold text-foreground">
+                  "Aggiungi alla schermata Home" <PlusSquare size={13} className="inline mx-0.5 text-primary" />
                 </span>
                 .
               </li>
               <li>
-                Conferma toccando <span className="font-semibold text-white">"Aggiungi"</span> in alto a destra.
+                Conferma toccando <span className="font-semibold text-foreground">"Aggiungi"</span> in alto a destra.
               </li>
             </ol>
           </div>
@@ -232,8 +232,8 @@ export function PwaInstallCard() {
         {/* Installed State Card Info */}
         {(isStandalone || installSuccess) && (
           <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3">
-            <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />
-            <p className="text-xs text-emerald-300">
+            <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+            <p className="text-xs text-emerald-700 dark:text-emerald-300">
               Ottimo! L'applicazione è installata correttamente sul tuo dispositivo con supporto completo per la cache e le funzionalità offline.
             </p>
           </div>

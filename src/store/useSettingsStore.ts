@@ -17,6 +17,27 @@ export const DEFAULT_EQ_PRESETS: EqualizerPreset[] = [
   { name: "Acoustic", gains: [3, 2, 1, 1, 2, 2, 3, 3, 2, 1] },
 ];
 
+export type ThemeMode = "light" | "dark" | "oled" | "system";
+export type ThemeColor =
+  | "neutral"
+  | "zinc"
+  | "slate"
+  | "stone"
+  | "gray"
+  | "amber"
+  | "blue"
+  | "cyan"
+  | "emerald"
+  | "fuchsia"
+  | "green"
+  | "indigo"
+  | "lime"
+  | "orange"
+  | "pink"
+  | "rose"
+  | "violet"
+  | "yellow";
+
 interface SettingsState {
   bitrate: BitrateOption;
   format: TranscodingFormat;
@@ -28,7 +49,8 @@ interface SettingsState {
   equalizerEnabled: boolean;
   equalizerPreset: string;
   equalizerGains: number[]; // 10 values (-12dB to +12dB)
-  themeMode: "dark" | "oled" | "system";
+  themeMode: ThemeMode;
+  themeColor: ThemeColor;
 
   // Actions
   setBitrate: (bitrate: BitrateOption) => void;
@@ -41,7 +63,8 @@ interface SettingsState {
   setEqualizerEnabled: (enabled: boolean) => void;
   setEqualizerPreset: (presetName: string) => void;
   setEqualizerBandGain: (bandIndex: number, gain: number) => void;
-  setThemeMode: (theme: "dark" | "oled" | "system") => void;
+  setThemeMode: (theme: ThemeMode) => void;
+  setThemeColor: (color: ThemeColor) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -58,6 +81,7 @@ export const useSettingsStore = create<SettingsState>()(
       equalizerPreset: "Piatto (Flat)",
       equalizerGains: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       themeMode: "dark",
+      themeColor: "indigo",
 
       setBitrate: (bitrate) => set({ bitrate }),
       setFormat: (format) => set({ format }),
@@ -82,6 +106,7 @@ export const useSettingsStore = create<SettingsState>()(
           return { equalizerGains: updated, equalizerPreset: "Personalizzato" };
         }),
       setThemeMode: (themeMode) => set({ themeMode }),
+      setThemeColor: (themeColor) => set({ themeColor }),
     }),
     {
       name: "navidrome-settings-storage",

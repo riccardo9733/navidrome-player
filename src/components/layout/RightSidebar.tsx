@@ -21,19 +21,19 @@ export function RightSidebar() {
   if (!isLyricsOpen && !isQueueOpen) return null;
 
   return (
-    <aside className="hidden lg:flex flex-col w-80 shrink-0 h-full border-l border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl p-4 overflow-hidden shadow-2xl z-20 animate-in slide-in-from-right duration-200">
+    <aside className="hidden lg:flex flex-col w-80 shrink-0 h-full border-l border-border bg-card/80 backdrop-blur-xl p-4 overflow-hidden shadow-2xl z-20 animate-in slide-in-from-right duration-200 transition-colors">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
+      <div className="flex items-center justify-between pb-3 border-b border-border">
         <div className="flex items-center gap-2">
           {isLyricsOpen ? (
             <>
-              <FileText size={18} className="text-indigo-400" />
-              <h3 className="text-sm font-bold text-white">Testi Sincronizzati</h3>
+              <FileText size={18} className="text-primary" />
+              <h3 className="text-sm font-bold text-foreground">Testi Sincronizzati</h3>
             </>
           ) : (
             <>
-              <ListMusic size={18} className="text-indigo-400" />
-              <h3 className="text-sm font-bold text-white">Coda di Riproduzione</h3>
+              <ListMusic size={18} className="text-primary" />
+              <h3 className="text-sm font-bold text-foreground">Coda di Riproduzione</h3>
             </>
           )}
         </div>
@@ -43,7 +43,7 @@ export function RightSidebar() {
             <button
               onClick={clearQueue}
               title="Svuota coda"
-              className="p-1.5 text-zinc-400 hover:text-red-400 rounded-lg hover:bg-zinc-800 transition-colors"
+              className="p-1.5 text-muted-foreground hover:text-destructive rounded-lg hover:bg-secondary transition-colors cursor-pointer"
             >
               <Trash2 size={16} />
             </button>
@@ -54,7 +54,7 @@ export function RightSidebar() {
               setLyricsOpen(false);
               setQueueOpen(false);
             }}
-            className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors"
+            className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-secondary transition-colors cursor-pointer"
           >
             <X size={18} />
           </button>
@@ -75,24 +75,24 @@ export function RightSidebar() {
                   onClick={() => playSong(track, queue, idx)}
                   className={`group flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-colors ${
                     isCur
-                      ? "bg-indigo-600/20 text-indigo-400 border border-indigo-500/30"
-                      : "hover:bg-zinc-900 text-zinc-300"
+                      ? "bg-primary/15 text-primary border border-primary/30"
+                      : "hover:bg-secondary text-foreground"
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="text-xs font-mono text-zinc-500 w-4 text-center">
+                    <span className="text-xs font-mono text-muted-foreground w-4 text-center">
                       {isCur ? "▶" : idx + 1}
                     </span>
                     <div className="flex flex-col min-w-0">
-                      <p className={`text-xs font-semibold truncate ${isCur ? "text-indigo-400" : "text-white"}`}>
+                      <p className={`text-xs font-semibold truncate ${isCur ? "text-primary" : "text-foreground"}`}>
                         {track.title}
                       </p>
-                      <p className="text-[11px] text-zinc-400 truncate">{track.artist}</p>
+                      <p className="text-[11px] text-muted-foreground truncate">{track.artist}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-[11px] font-mono text-zinc-500">
+                    <span className="text-[11px] font-mono text-muted-foreground">
                       {formatDuration(track.duration)}
                     </span>
                     <button
@@ -100,7 +100,7 @@ export function RightSidebar() {
                         e.stopPropagation();
                         removeFromQueue(idx);
                       }}
-                      className="p-1 text-zinc-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="p-1 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <Trash2 size={13} />
                     </button>

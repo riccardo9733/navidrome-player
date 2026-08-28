@@ -1,18 +1,72 @@
 @import "tailwindcss";
 
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+}
+
 @layer base {
-  :root {
+  /* Light Mode Variables */
+  :root,
+  html.light {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 98.5%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 238.7 83.5% 66.7%;
+    --primary-foreground: 0 0% 100%;
+    --primary-rgb: 99, 102, 241;
+    --secondary: 240 5% 94%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 5% 94%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 240 5% 92%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 6% 88%;
+    --input: 240 6% 88%;
+    --ring: 238.7 83.5% 66.7%;
+    --radius: 0.75rem;
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-nav-bg: rgba(250, 250, 252, 0.88);
+    --glass-player-bg: rgba(255, 255, 255, 0.94);
+  }
+
+  /* Dark Mode Variables (Default) */
+  html.dark {
     --background: 240 10% 4%;
     --foreground: 0 0% 98%;
-    --card: 240 10% 6%;
+    --card: 240 10% 6.5%;
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 6%;
+    --popover: 240 10% 6.5%;
     --popover-foreground: 0 0% 98%;
-    --primary: 245 80% 65%;
+    --primary: 238.7 83.5% 66.7%;
     --primary-foreground: 0 0% 100%;
+    --primary-rgb: 99, 102, 241;
     --secondary: 240 5% 15%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 240 5% 20%;
+    --muted: 240 5% 18%;
     --muted-foreground: 240 5% 65%;
     --accent: 240 5% 18%;
     --accent-foreground: 0 0% 98%;
@@ -20,13 +74,330 @@
     --destructive-foreground: 0 0% 98%;
     --border: 240 6% 14%;
     --input: 240 6% 14%;
-    --ring: 245 80% 65%;
+    --ring: 238.7 83.5% 66.7%;
     --radius: 0.75rem;
+    --glass-bg: rgba(18, 20, 29, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-nav-bg: rgba(10, 11, 16, 0.88);
+    --glass-player-bg: rgba(13, 15, 22, 0.94);
   }
 
+  /* OLED Pure Black Mode */
+  html.oled {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3%;
+    --popover-foreground: 0 0% 98%;
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 10%;
+    --accent-foreground: 0 0% 98%;
+    --border: 0 0% 12%;
+    --input: 0 0% 12%;
+    --glass-bg: rgba(0, 0, 0, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-nav-bg: rgba(0, 0, 0, 0.94);
+    --glass-player-bg: rgba(0, 0, 0, 0.96);
+  }
+
+  /* ----------------- SHADCN COLOR THEMES ----------------- */
+
+  /* Neutral */
+  [data-theme="neutral"],
+  [data-theme="neutral"].light {
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --ring: 0 0% 9%;
+    --primary-rgb: 23, 23, 23;
+  }
+  html.dark[data-theme="neutral"],
+  html.dark [data-theme="neutral"] {
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --ring: 0 0% 89.8%;
+    --primary-rgb: 250, 250, 250;
+  }
+
+  /* Zinc */
+  [data-theme="zinc"],
+  [data-theme="zinc"].light {
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --ring: 240 5.9% 10%;
+    --primary-rgb: 24, 24, 27;
+  }
+  html.dark[data-theme="zinc"],
+  html.dark [data-theme="zinc"] {
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --ring: 240 4.9% 83.9%;
+    --primary-rgb: 250, 250, 250;
+  }
+
+  /* Slate */
+  [data-theme="slate"],
+  [data-theme="slate"].light {
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --ring: 222.2 84% 4.9%;
+    --primary-rgb: 15, 23, 42;
+  }
+  html.dark[data-theme="slate"],
+  html.dark [data-theme="slate"] {
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --ring: 212.7 26.8% 83.9%;
+    --primary-rgb: 241, 245, 249;
+  }
+
+  /* Stone */
+  [data-theme="stone"],
+  [data-theme="stone"].light {
+    --primary: 24 9.8% 10%;
+    --primary-foreground: 60 9.1% 97.8%;
+    --ring: 20 14.3% 4.1%;
+    --primary-rgb: 28, 25, 23;
+  }
+  html.dark[data-theme="stone"],
+  html.dark [data-theme="stone"] {
+    --primary: 60 9.1% 97.8%;
+    --primary-foreground: 24 9.8% 10%;
+    --ring: 24 5.7% 82.9%;
+    --primary-rgb: 250, 250, 249;
+  }
+
+  /* Gray */
+  [data-theme="gray"],
+  [data-theme="gray"].light {
+    --primary: 220.9 39.3% 11%;
+    --primary-foreground: 210 20% 98%;
+    --ring: 224 71.4% 4.1%;
+    --primary-rgb: 17, 24, 39;
+  }
+  html.dark[data-theme="gray"],
+  html.dark [data-theme="gray"] {
+    --primary: 210 20% 98%;
+    --primary-foreground: 220.9 39.3% 11%;
+    --ring: 217.9 10.6% 64.9%;
+    --primary-rgb: 249, 250, 251;
+  }
+
+  /* Amber */
+  [data-theme="amber"],
+  [data-theme="amber"].light {
+    --primary: 37.7 92.1% 50.2%;
+    --primary-foreground: 48 96% 89%;
+    --ring: 37.7 92.1% 50.2%;
+    --primary-rgb: 245, 158, 11;
+  }
+  html.dark[data-theme="amber"],
+  html.dark [data-theme="amber"] {
+    --primary: 37.7 92.1% 50.2%;
+    --primary-foreground: 0 0% 10%;
+    --ring: 37.7 92.1% 50.2%;
+    --primary-rgb: 245, 158, 11;
+  }
+
+  /* Blue */
+  [data-theme="blue"],
+  [data-theme="blue"].light {
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --ring: 221.2 83.2% 53.3%;
+    --primary-rgb: 59, 130, 246;
+  }
+  html.dark[data-theme="blue"],
+  html.dark [data-theme="blue"] {
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --ring: 217.2 91.2% 59.8%;
+    --primary-rgb: 59, 130, 246;
+  }
+
+  /* Cyan */
+  [data-theme="cyan"],
+  [data-theme="cyan"].light {
+    --primary: 188.7 94.5% 42.7%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 188.7 94.5% 42.7%;
+    --primary-rgb: 6, 182, 212;
+  }
+  html.dark[data-theme="cyan"],
+  html.dark [data-theme="cyan"] {
+    --primary: 188.7 94.5% 42.7%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 188.7 94.5% 42.7%;
+    --primary-rgb: 6, 182, 212;
+  }
+
+  /* Emerald */
+  [data-theme="emerald"],
+  [data-theme="emerald"].light {
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 160 84% 39%;
+    --primary-rgb: 16, 185, 129;
+  }
+  html.dark[data-theme="emerald"],
+  html.dark [data-theme="emerald"] {
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 160 84% 39%;
+    --primary-rgb: 16, 185, 129;
+  }
+
+  /* Fuchsia */
+  [data-theme="fuchsia"],
+  [data-theme="fuchsia"].light {
+    --primary: 292.2 84.1% 60.6%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 292.2 84.1% 60.6%;
+    --primary-rgb: 217, 70, 239;
+  }
+  html.dark[data-theme="fuchsia"],
+  html.dark [data-theme="fuchsia"] {
+    --primary: 292.2 84.1% 60.6%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 292.2 84.1% 60.6%;
+    --primary-rgb: 217, 70, 239;
+  }
+
+  /* Green */
+  [data-theme="green"],
+  [data-theme="green"].light {
+    --primary: 142.1 76.2% 36.3%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --ring: 142.1 76.2% 36.3%;
+    --primary-rgb: 34, 197, 94;
+  }
+  html.dark[data-theme="green"],
+  html.dark [data-theme="green"] {
+    --primary: 142.1 70.6% 45.3%;
+    --primary-foreground: 144.9 80.4% 10%;
+    --ring: 142.1 70.6% 45.3%;
+    --primary-rgb: 34, 197, 94;
+  }
+
+  /* Indigo (Default) */
+  [data-theme="indigo"],
+  [data-theme="indigo"].light {
+    --primary: 238.7 83.5% 66.7%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 238.7 83.5% 66.7%;
+    --primary-rgb: 99, 102, 241;
+  }
+  html.dark[data-theme="indigo"],
+  html.dark [data-theme="indigo"] {
+    --primary: 238.7 83.5% 66.7%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 238.7 83.5% 66.7%;
+    --primary-rgb: 99, 102, 241;
+  }
+
+  /* Lime */
+  [data-theme="lime"],
+  [data-theme="lime"].light {
+    --primary: 84.8 85.2% 34.5%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 84.8 85.2% 34.5%;
+    --primary-rgb: 132, 204, 22;
+  }
+  html.dark[data-theme="lime"],
+  html.dark [data-theme="lime"] {
+    --primary: 84.8 85.2% 45%;
+    --primary-foreground: 0 0% 10%;
+    --ring: 84.8 85.2% 45%;
+    --primary-rgb: 132, 204, 22;
+  }
+
+  /* Orange */
+  [data-theme="orange"],
+  [data-theme="orange"].light {
+    --primary: 24.6 95% 53.1%;
+    --primary-foreground: 60 9.1% 97.8%;
+    --ring: 24.6 95% 53.1%;
+    --primary-rgb: 249, 115, 22;
+  }
+  html.dark[data-theme="orange"],
+  html.dark [data-theme="orange"] {
+    --primary: 20.5 90.2% 48.2%;
+    --primary-foreground: 60 9.1% 97.8%;
+    --ring: 20.5 90.2% 48.2%;
+    --primary-rgb: 249, 115, 22;
+  }
+
+  /* Pink */
+  [data-theme="pink"],
+  [data-theme="pink"].light {
+    --primary: 330.4 81.2% 60.4%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 330.4 81.2% 60.4%;
+    --primary-rgb: 236, 72, 153;
+  }
+  html.dark[data-theme="pink"],
+  html.dark [data-theme="pink"] {
+    --primary: 330.4 81.2% 60.4%;
+    --primary-foreground: 0 0% 100%;
+    --ring: 330.4 81.2% 60.4%;
+    --primary-rgb: 236, 72, 153;
+  }
+
+  /* Rose */
+  [data-theme="rose"],
+  [data-theme="rose"].light {
+    --primary: 346.8 77.2% 49.8%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --ring: 346.8 77.2% 49.8%;
+    --primary-rgb: 244, 63, 94;
+  }
+  html.dark[data-theme="rose"],
+  html.dark [data-theme="rose"] {
+    --primary: 346.8 77.2% 49.8%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --ring: 346.8 77.2% 49.8%;
+    --primary-rgb: 244, 63, 94;
+  }
+
+  /* Violet */
+  [data-theme="violet"],
+  [data-theme="violet"].light {
+    --primary: 262.1 83.3% 57.8%;
+    --primary-foreground: 210 40% 98%;
+    --ring: 262.1 83.3% 57.8%;
+    --primary-rgb: 139, 92, 246;
+  }
+  html.dark[data-theme="violet"],
+  html.dark [data-theme="violet"] {
+    --primary: 263.4 70% 50.4%;
+    --primary-foreground: 210 40% 98%;
+    --ring: 263.4 70% 50.4%;
+    --primary-rgb: 139, 92, 246;
+  }
+
+  /* Yellow */
+  [data-theme="yellow"],
+  [data-theme="yellow"].light {
+    --primary: 47.9 95.8% 53.1%;
+    --primary-foreground: 26 83.3% 14.1%;
+    --ring: 47.9 95.8% 53.1%;
+    --primary-rgb: 234, 179, 8;
+  }
+  html.dark[data-theme="yellow"],
+  html.dark [data-theme="yellow"] {
+    --primary: 47.9 95.8% 53.1%;
+    --primary-foreground: 26 83.3% 14.1%;
+    --ring: 47.9 95.8% 53.1%;
+    --primary-rgb: 234, 179, 8;
+  }
+
+  /* Base Body Styles */
   body {
-    background-color: #08090d;
-    color: #f3f4f6;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -34,6 +405,7 @@
     user-select: none;
     -webkit-user-select: none;
     padding-bottom: env(safe-area-inset-bottom, 0px);
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 }
 
@@ -48,37 +420,37 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: hsl(var(--muted-foreground) / 0.25);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: hsl(var(--muted-foreground) / 0.45);
 }
 
-/* Glassmorphism Utilities */
+/* Glassmorphism Utilities that adapt to Theme */
 .glass-panel {
-  background: rgba(18, 20, 29, 0.75);
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
 }
 
 .glass-nav {
-  background: rgba(10, 11, 16, 0.85);
+  background: var(--glass-nav-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--glass-border);
 }
 
 .glass-player {
-  background: rgba(13, 15, 22, 0.92);
+  background: var(--glass-player-bg);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--glass-border);
 }
 
-/* Dynamic Ambient Glow */
+/* Dynamic Ambient Glow adapting to Active Primary Theme */
 .ambient-glow {
   position: absolute;
   top: -20%;
@@ -86,10 +458,11 @@
   width: 80%;
   height: 60%;
   border-radius: 50%;
+  background: radial-gradient(circle, hsl(var(--primary) / 0.35) 0%, transparent 70%);
   filter: blur(120px);
-  opacity: 0.25;
+  opacity: 0.4;
   pointer-events: none;
-  transition: all 1s ease-in-out;
+  transition: all 0.8s ease-in-out;
   z-index: 0;
 }
 
@@ -107,8 +480,8 @@ input[type="range"]::-webkit-slider-thumb {
   height: 14px;
   width: 14px;
   border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  background: hsl(var(--primary));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
   cursor: pointer;
   transition: transform 0.15s ease;
 }

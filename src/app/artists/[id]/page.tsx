@@ -43,8 +43,8 @@ export default function ArtistDetailPage({ params }: { params: Promise<{ id: str
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-32 text-zinc-400 gap-3">
-        <Loader2 size={32} className="animate-spin text-indigo-400" />
+      <div className="flex items-center justify-center py-32 text-muted-foreground gap-3">
+        <Loader2 size={32} className="animate-spin text-primary" />
         <p>Caricamento artista...</p>
       </div>
     );
@@ -52,9 +52,9 @@ export default function ArtistDetailPage({ params }: { params: Promise<{ id: str
 
   if (!artist) {
     return (
-      <div className="text-center py-24 text-zinc-400">
-        <p className="text-xl font-bold">Artista non trovato</p>
-        <Link href="/artists" className="mt-4 inline-block text-indigo-400 hover:underline">
+      <div className="text-center py-24 text-muted-foreground">
+        <p className="text-xl font-bold text-foreground">Artista non trovato</p>
+        <Link href="/artists" className="mt-4 inline-block text-primary hover:underline">
           Torna agli artisti
         </Link>
       </div>
@@ -81,8 +81,8 @@ export default function ArtistDetailPage({ params }: { params: Promise<{ id: str
   return (
     <div className="space-y-8 max-w-6xl mx-auto animate-in fade-in duration-300">
       {/* Header Profile */}
-      <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 pb-6 border-b border-zinc-800">
-        <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden bg-zinc-800 shadow-2xl shrink-0 border-4 border-zinc-800">
+      <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 pb-6 border-b border-border">
+        <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden bg-secondary shadow-2xl shrink-0 border-4 border-border">
           {imageUrl && !imgError ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -92,7 +92,7 @@ export default function ArtistDetailPage({ params }: { params: Promise<{ id: str
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-900 text-white">
+            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-primary/30 to-secondary text-primary">
               <span className="text-4xl font-extrabold tracking-wider">
                 {artist.name.slice(0, 2).toUpperCase()}
               </span>
@@ -101,19 +101,19 @@ export default function ArtistDetailPage({ params }: { params: Promise<{ id: str
         </div>
 
         <div className="flex flex-col items-center sm:items-start text-center sm:text-left space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">
+          <span className="text-xs font-bold uppercase tracking-wider text-primary">
             Artista
           </span>
-          <h1 className="text-3xl md:text-5xl font-extrabold text-white">{artist.name}</h1>
-          <p className="text-sm text-zinc-400">{albums.length} Album nella libreria</p>
+          <h1 className="text-3xl md:text-5xl font-extrabold text-foreground">{artist.name}</h1>
+          <p className="text-sm text-muted-foreground">{albums.length} Album nella libreria</p>
 
           <div className="pt-2">
             <button
               onClick={handleStarToggle}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-semibold transition-colors ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full border text-sm font-semibold transition-colors cursor-pointer ${
                 isStarred
-                  ? "bg-pink-500/10 border-pink-500/20 text-pink-500"
-                  : "bg-zinc-900 border-zinc-800 hover:bg-zinc-800 text-zinc-300"
+                  ? "bg-primary/10 border-primary/20 text-primary"
+                  : "bg-secondary border-border hover:bg-secondary/80 text-muted-foreground hover:text-foreground"
               }`}
             >
               <Heart size={16} className={isStarred ? "fill-current" : ""} />
@@ -125,9 +125,9 @@ export default function ArtistDetailPage({ params }: { params: Promise<{ id: str
 
       {/* Discography */}
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-white tracking-tight">Discografia</h2>
+        <h2 className="text-xl font-bold text-foreground tracking-tight">Discografia</h2>
         {albums.length === 0 ? (
-          <p className="text-sm text-zinc-500">Nessun album trovato per questo artista.</p>
+          <p className="text-sm text-muted-foreground">Nessun album trovato per questo artista.</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {albums.map((album) => (

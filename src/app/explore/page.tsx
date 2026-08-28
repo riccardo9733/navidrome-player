@@ -38,20 +38,20 @@ export default function ExplorePage() {
   return (
     <div className="space-y-10 max-w-7xl mx-auto animate-in fade-in duration-300">
       {/* Header */}
-      <div className="flex items-center gap-3 pb-4 border-b border-zinc-800">
-        <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+      <div className="flex items-center gap-3 pb-4 border-b border-border">
+        <div className="p-3 rounded-2xl bg-primary/10 text-primary border border-primary/20">
           <Compass size={24} />
         </div>
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-white">Esplora</h1>
-          <p className="text-xs text-zinc-400">Naviga per genere musicale e scopri album casuali</p>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-foreground">Esplora</h1>
+          <p className="text-xs text-muted-foreground">Naviga per genere musicale e scopri album casuali</p>
         </div>
       </div>
 
       {/* Genres Section */}
       <section className="space-y-4">
-        <h2 className="text-xl font-bold text-white flex items-center gap-2">
-          <Music2 size={20} className="text-indigo-400" /> Generi Musicali
+        <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+          <Music2 size={20} className="text-primary" /> Generi Musicali
         </h2>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -74,14 +74,14 @@ export default function ExplorePage() {
 
       {/* Random Mix Section */}
       <section className="space-y-4">
-        <h2 className="text-xl font-bold text-white flex items-center gap-2">
-          <Disc size={20} className="text-indigo-400" /> Scoperta Casuale (Random Discovery)
+        <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+          <Disc size={20} className="text-primary" /> Scoperta Casuale (Random Discovery)
         </h2>
 
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="aspect-square bg-zinc-900/60 rounded-2xl animate-pulse" />
+              <div key={i} className="aspect-square bg-secondary rounded-2xl animate-pulse" />
             ))}
           </div>
         ) : (

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { ThemeProvider } from "../components/theme/ThemeProvider";
 import { AudioProvider } from "../components/audio/AudioProvider";
 import { Sidebar } from "../components/layout/Sidebar";
 import { Header } from "../components/layout/Header";
@@ -40,46 +41,83 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+const themeBootstrapScript = `
+(function() {
+  try {
+    var raw = localStorage.getItem('navidrome-settings-storage');
+    var parsed = raw ? JSON.parse(raw) : null;
+    var state = parsed && parsed.state ? parsed.state : {};
+    var mode = state.themeMode || 'dark';
+    var color = state.themeColor || 'indigo';
+
+    var effectiveMode = mode;
+    if (mode === 'system') {
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      effectiveMode = prefersDark ? 'dark' : 'light';
+    }
+
+    var doc = document.documentElement;
+    doc.classList.remove('light', 'dark', 'oled');
+    if (effectiveMode === 'oled') {
+      doc.classList.add('dark', 'oled');
+      doc.style.colorScheme = 'dark';
+    } else if (effectiveMode === 'dark') {
+      doc.classList.add('dark');
+      doc.style.colorScheme = 'dark';
+    } else {
+      doc.classList.add('light');
+      doc.style.colorScheme = 'light';
+    }
+    doc.setAttribute('data-theme', color);
+  } catch (e) {}
+})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="it" className="dark">
-      <body className="bg-[#08090d] text-zinc-100 antialiased h-[100dvh] overflow-hidden flex flex-col">
-        <AudioProvider>
-          <div className="flex flex-1 overflow-hidden">
-            {/* Desktop Left Sidebar */}
-            <Sidebar />
+    <html lang="it" suppressHydrationWarning className="dark" data-theme="indigo">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+      </head>
+      <body className="bg-background text-foreground antialiased h-[100dvh] overflow-hidden flex flex-col transition-colors duration-200">
+        <ThemeProvider>
+          <AudioProvider>
+            <div className="flex flex-1 overflow-hidden">
+              {/* Desktop Left Sidebar */}
+              <Sidebar />
 
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col overflow-hidden">
-              <Header />
-              <main className="flex-1 overflow-y-auto px-4 md:px-8 pt-3 pb-36 md:pt-6 md:pb-28">
-                {children}
-              </main>
+              {/* Main Content Area */}
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <Header />
+                <main className="flex-1 overflow-y-auto px-4 md:px-8 pt-3 pb-36 md:pt-6 md:pb-28">
+                  {children}
+                </main>
+              </div>
+
+              {/* Desktop Right Sidebar (Lyrics / Queue) */}
+              <RightSidebar />
             </div>
 
-            {/* Desktop Right Sidebar (Lyrics / Queue) */}
-            <RightSidebar />
-          </div>
+            {/* Desktop Persistent Bottom Bar */}
+            <BottomPlayerBar />
 
-          {/* Desktop Persistent Bottom Bar */}
-          <BottomPlayerBar />
+            {/* Mobile Floating Mini Player */}
+            <MiniPlayer />
 
-          {/* Mobile Floating Mini Player */}
-          <MiniPlayer />
+            {/* Mobile Persistent Bottom Navigation */}
+            <MobileNav />
 
-          {/* Mobile Persistent Bottom Navigation */}
-          <MobileNav />
+            {/* Fullscreen Player Modal / Mobile Vaul Drawer */}
+            <FullscreenPlayerModal />
 
-          {/* Fullscreen Player Modal / Mobile Vaul Drawer */}
-          <FullscreenPlayerModal />
-
-          {/* 10-Band Equalizer Modal */}
-          <EqualizerModal />
-        </AudioProvider>
+            {/* 10-Band Equalizer Modal */}
+            <EqualizerModal />
+          </AudioProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -44,7 +44,7 @@ export function MobileNav() {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 glass-nav z-40 px-3 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] flex items-center justify-around select-none">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 glass-nav z-40 px-3 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] flex items-center justify-around select-none transition-colors duration-200">
       {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = item.isActive;
@@ -53,21 +53,21 @@ export function MobileNav() {
             key={item.href}
             href={item.href}
             className={`relative flex flex-col items-center justify-center flex-1 py-1.5 transition-all duration-200 active:scale-95 ${
-              isActive ? "text-indigo-400" : "text-zinc-400 hover:text-zinc-200"
+              isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {isActive && (
-              <span className="absolute -top-1 w-8 h-1 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
+              <span className="absolute -top-1 w-8 h-1 rounded-full bg-primary shadow-[0_0_10px_hsl(var(--primary)/0.7)]" />
             )}
             <Icon
               size={22}
               className={`transition-transform duration-200 ${
-                isActive ? "text-indigo-400 scale-110" : "text-zinc-400"
+                isActive ? "text-primary scale-110" : "text-muted-foreground"
               }`}
             />
             <span
               className={`text-[10.5px] tracking-tight mt-1 transition-colors ${
-                isActive ? "font-semibold text-indigo-300" : "font-medium text-zinc-400"
+                isActive ? "font-semibold text-primary" : "font-medium text-muted-foreground"
               }`}
             >
               {item.name}

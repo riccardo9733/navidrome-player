@@ -7,7 +7,6 @@ import {
   Trash2,
   CheckCircle2,
   XCircle,
-  Sliders,
   HardDrive,
   ShieldCheck,
   Radio,
@@ -20,6 +19,7 @@ import { useSettingsStore } from "../../store/useSettingsStore";
 import { BitrateOption, TranscodingFormat } from "../../lib/subsonic/types";
 import { clearAllDownloads } from "../../lib/db/downloadManager";
 import { PwaInstallCard } from "../../components/settings/PwaInstallCard";
+import { ThemeSelector } from "../../components/settings/ThemeSelector";
 
 export default function SettingsPage() {
   const profiles = useAuthStore((s) => s.profiles);
@@ -94,26 +94,28 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto animate-in fade-in duration-300 pb-12">
+    <div className="space-y-8 max-w-4xl mx-auto animate-in fade-in duration-300 pb-16">
       {/* Header */}
-      <div className="pb-4 border-b border-zinc-800">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-white">Impostazioni</h1>
-        <p className="text-xs text-zinc-400">Configurazione server Navidrome, app PWA, qualità audio, equalizzatore e cache</p>
+      <div className="pb-4 border-b border-border">
+        <h1 className="text-2xl md:text-3xl font-extrabold text-foreground">Impostazioni</h1>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Configurazione server Navidrome, temi Shadcn, app PWA, qualità audio, equalizzatore e cache
+        </p>
       </div>
 
       {/* Live Server Status Card */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 backdrop-blur-xl shadow-lg space-y-3">
+      <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border backdrop-blur-xl shadow-sm space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div
               className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
                 isOfflineMode
-                  ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                  ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
                   : isConnected && activeProfile
-                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                  ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
                   : activeProfile
-                  ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                  : "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
+                  ? "bg-red-500/10 text-red-500 border border-red-500/20"
+                  : "bg-primary/10 text-primary border border-primary/20"
               }`}
             >
               {isOfflineMode ? (
@@ -121,7 +123,7 @@ export default function SettingsPage() {
               ) : isConnected && activeProfile ? (
                 <ShieldCheck size={20} />
               ) : activeProfile ? (
-                <Server size={20} className="text-red-400" />
+                <Server size={20} className="text-destructive" />
               ) : (
                 <Server size={20} />
               )}
@@ -129,26 +131,26 @@ export default function SettingsPage() {
 
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-white">Stato Connessione:</span>
+                <span className="text-sm font-bold text-foreground">Stato Connessione:</span>
                 {isOfflineMode ? (
-                  <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold">
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 text-xs font-semibold">
                     Offline Mode
                   </span>
                 ) : isConnected && activeProfile ? (
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Connesso a {activeProfile.name}
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 text-xs font-semibold flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Connesso a {activeProfile.name}
                   </span>
                 ) : activeProfile ? (
-                  <span className="px-2.5 py-0.5 rounded-full bg-red-500/20 text-red-400 text-xs font-semibold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-400" /> Disconnesso / Non raggiungibile
+                  <span className="px-2.5 py-0.5 rounded-full bg-destructive/20 text-destructive text-xs font-semibold flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-destructive" /> Disconnesso / Non raggiungibile
                   </span>
                 ) : (
-                  <span className="px-2.5 py-0.5 rounded-full bg-zinc-800 text-zinc-400 text-xs font-semibold">
+                  <span className="px-2.5 py-0.5 rounded-full bg-secondary text-muted-foreground text-xs font-semibold">
                     Nessun server configurato
                   </span>
                 )}
               </div>
-              <p className="text-xs text-zinc-400 mt-0.5">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 {isOfflineMode
                   ? "Riproduzione abilitata solo per i brani e album scaricati in locale"
                   : isConnected && activeProfile
@@ -163,10 +165,10 @@ export default function SettingsPage() {
           <div className="flex items-center gap-2 self-start sm:self-auto">
             <button
               onClick={() => toggleOfflineMode()}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
                 isOfflineMode
-                  ? "bg-amber-500 text-black border-amber-400 font-bold"
-                  : "bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 border-zinc-700"
+                  ? "bg-amber-500 text-black border-amber-400 font-bold shadow-sm"
+                  : "bg-secondary hover:bg-secondary/80 text-foreground border-border"
               }`}
             >
               {isOfflineMode ? <Wifi size={14} /> : <WifiOff size={14} />}
@@ -176,17 +178,22 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* 1. Server Configuration Section */}
+      {/* 1. Theme & Appearance Section (Shadcn Themes & Light/Dark/OLED) */}
+      <ThemeSelector />
+
+      {/* 2. Server Configuration Section */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <Server size={20} className="text-indigo-400" />
-            <h2 className="text-lg font-bold text-white">Server Navidrome / Subsonic</h2>
+            <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20">
+              <Server size={18} />
+            </div>
+            <h2 className="text-lg font-bold text-foreground">Server Navidrome / Subsonic</h2>
           </div>
 
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold shadow-sm hover:opacity-90 transition-all cursor-pointer"
           >
             <Plus size={14} /> Aggiungi Server
           </button>
@@ -195,9 +202,9 @@ export default function SettingsPage() {
         {/* Existing Profiles List */}
         <div className="space-y-2">
           {profiles.length === 0 ? (
-            <div className="p-6 rounded-2xl bg-zinc-900/40 border border-dashed border-zinc-800 text-center space-y-2">
-              <p className="text-sm font-semibold text-zinc-300">Nessun server collegato</p>
-              <p className="text-xs text-zinc-500">
+            <div className="p-6 rounded-2xl bg-card border border-dashed border-border text-center space-y-2">
+              <p className="text-sm font-semibold text-foreground">Nessun server collegato</p>
+              <p className="text-xs text-muted-foreground">
                 Aggiungi il tuo URL Navidrome per ascoltare tutta la tua libreria personale.
               </p>
             </div>
@@ -210,26 +217,26 @@ export default function SettingsPage() {
                   onClick={() => setActiveProfile(p.id)}
                   className={`flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all border ${
                     isActive
-                      ? "bg-indigo-950/40 border-indigo-500/50 shadow-lg shadow-indigo-500/10"
-                      : "bg-zinc-900/40 border-zinc-800 hover:bg-zinc-800/40"
+                      ? "bg-primary/10 border-primary shadow-sm ring-1 ring-primary/20"
+                      : "bg-card border-border hover:bg-secondary/40"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-3 h-3 rounded-full ${
-                        isActive && isConnected ? "bg-emerald-500 shadow-md shadow-emerald-500/50" : "bg-zinc-600"
+                        isActive && isConnected ? "bg-emerald-500 shadow-sm" : "bg-muted-foreground/40"
                       }`}
                     />
                     <div>
-                      <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                      <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
                         {p.name}
                         {isActive && (
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400">
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/20 text-primary">
                             Attivo
                           </span>
                         )}
                       </h4>
-                      <p className="text-xs text-zinc-400 font-mono mt-0.5">
+                      <p className="text-xs text-muted-foreground font-mono mt-0.5">
                         {p.url} ({p.username})
                       </p>
                     </div>
@@ -242,7 +249,7 @@ export default function SettingsPage() {
                           e.stopPropagation();
                           handleTestActiveConnection();
                         }}
-                        className="px-3 py-1 text-xs rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300"
+                        className="px-3 py-1 text-xs rounded-lg bg-secondary hover:bg-secondary/80 text-foreground border border-border font-medium cursor-pointer"
                       >
                         Test Ping
                       </button>
@@ -252,7 +259,7 @@ export default function SettingsPage() {
                         e.stopPropagation();
                         removeProfile(p.id);
                       }}
-                      className="p-2 text-zinc-500 hover:text-red-400 rounded-lg hover:bg-zinc-800 transition-colors"
+                      className="p-2 text-muted-foreground hover:text-destructive rounded-lg hover:bg-secondary transition-colors cursor-pointer"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -268,8 +275,8 @@ export default function SettingsPage() {
           <div
             className={`flex items-center gap-2 p-3.5 rounded-xl text-xs font-semibold ${
               testResult.success
-                ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-400"
-                : "bg-red-500/15 border border-red-500/30 text-red-400"
+                ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                : "bg-destructive/15 border border-destructive/30 text-destructive"
             }`}
           >
             {testResult.success ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
@@ -283,54 +290,54 @@ export default function SettingsPage() {
         {showAddForm && (
           <form
             onSubmit={handleAddServer}
-            className="p-6 rounded-2xl bg-zinc-900/90 border border-zinc-800 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200"
+            className="p-6 rounded-2xl bg-card border border-border shadow-xl space-y-4 animate-in fade-in zoom-in-95 duration-200"
           >
-            <h3 className="text-sm font-bold text-white">Configura Nuovo Server</h3>
+            <h3 className="text-sm font-bold text-foreground">Configura Nuovo Server</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-zinc-400">Nome Profilo</label>
+                <label className="text-xs font-semibold text-muted-foreground">Nome Profilo</label>
                 <input
                   type="text"
                   value={serverName}
                   onChange={(e) => setServerName(e.target.value)}
                   placeholder="Es. Navidrome Casa"
-                  className="w-full bg-zinc-950 px-3.5 py-2.5 rounded-xl border border-zinc-800 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                  className="w-full bg-background px-3.5 py-2.5 rounded-xl border border-border text-sm text-foreground focus:border-primary focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-zinc-400">URL del Server</label>
+                <label className="text-xs font-semibold text-muted-foreground">URL del Server</label>
                 <input
                   type="url"
                   required
                   value={serverUrl}
                   onChange={(e) => setServerUrl(e.target.value)}
                   placeholder="https://musica.tuodominio.com"
-                  className="w-full bg-zinc-950 px-3.5 py-2.5 rounded-xl border border-zinc-800 text-sm text-white focus:border-indigo-500 focus:outline-none font-mono"
+                  className="w-full bg-background px-3.5 py-2.5 rounded-xl border border-border text-sm text-foreground focus:border-primary focus:outline-none font-mono"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-zinc-400">Nome Utente</label>
+                <label className="text-xs font-semibold text-muted-foreground">Nome Utente</label>
                 <input
                   type="text"
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="admin"
-                  className="w-full bg-zinc-950 px-3.5 py-2.5 rounded-xl border border-zinc-800 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                  className="w-full bg-background px-3.5 py-2.5 rounded-xl border border-border text-sm text-foreground focus:border-primary focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-zinc-400">Password / Token</label>
+                <label className="text-xs font-semibold text-muted-foreground">Password / Token</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-zinc-950 px-3.5 py-2.5 rounded-xl border border-zinc-800 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                  className="w-full bg-background px-3.5 py-2.5 rounded-xl border border-border text-sm text-foreground focus:border-primary focus:outline-none"
                 />
               </div>
             </div>
@@ -341,9 +348,9 @@ export default function SettingsPage() {
                 id="legacyAuth"
                 checked={legacyAuth}
                 onChange={(e) => setLegacyAuth(e.target.checked)}
-                className="w-4 h-4 accent-indigo-600 rounded cursor-pointer"
+                className="w-4 h-4 accent-primary rounded cursor-pointer"
               />
-              <label htmlFor="legacyAuth" className="text-xs text-zinc-400 cursor-pointer">
+              <label htmlFor="legacyAuth" className="text-xs text-muted-foreground cursor-pointer">
                 Usa autenticazione legacy (password in chiaro anziché MD5 salt)
               </label>
             </div>
@@ -352,7 +359,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => setShowAddForm(false)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-zinc-400 hover:text-white"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 Annulla
               </button>
@@ -360,7 +367,7 @@ export default function SettingsPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-lg transition-all"
+                className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-md hover:opacity-90 transition-all cursor-pointer"
               >
                 {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />}
                 Salva e Connetti
@@ -370,28 +377,30 @@ export default function SettingsPage() {
         )}
       </section>
 
-      {/* 2. PWA Mobile & Desktop Section */}
+      {/* 3. PWA Mobile & Desktop Section */}
       <PwaInstallCard />
 
-      {/* 3. Streaming & Quality Settings */}
+      {/* 4. Streaming & Quality Settings */}
       <section className="space-y-4">
         <div className="flex items-center gap-2.5">
-          <Radio size={20} className="text-indigo-400" />
-          <h2 className="text-lg font-bold text-white">Qualità Audio & Transcodifica</h2>
+          <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20">
+            <Radio size={18} />
+          </div>
+          <h2 className="text-lg font-bold text-foreground">Qualità Audio & Transcodifica</h2>
         </div>
 
-        <div className="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800 space-y-6">
+        <div className="p-6 rounded-2xl bg-card border border-border space-y-6">
           {/* Bitrate Selector */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h4 className="text-sm font-bold text-white">Bitrate Massimale di Streaming</h4>
-              <p className="text-xs text-zinc-400">Limita il bitrate per risparmiare traffico dati</p>
+              <h4 className="text-sm font-bold text-foreground">Bitrate Massimale di Streaming</h4>
+              <p className="text-xs text-muted-foreground">Limita il bitrate per risparmiare traffico dati</p>
             </div>
 
             <select
               value={bitrate}
               onChange={(e) => setBitrate(parseInt(e.target.value, 10) as BitrateOption)}
-              className="bg-zinc-950 text-xs font-semibold text-white px-3.5 py-2 rounded-xl border border-zinc-800 focus:border-indigo-500 focus:outline-none"
+              className="bg-background text-xs font-semibold text-foreground px-3.5 py-2 rounded-xl border border-border focus:border-primary focus:outline-none"
             >
               <option value="0">Originale / Lossless (No Transcoding)</option>
               <option value="320">320 kbps (Massima Qualità)</option>
@@ -402,16 +411,16 @@ export default function SettingsPage() {
           </div>
 
           {/* Preferred Format */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-4 border-t border-zinc-800/60">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-4 border-t border-border">
             <div>
-              <h4 className="text-sm font-bold text-white">Formato di Transcodifica</h4>
-              <p className="text-xs text-zinc-400">Codec preferito quando la transcodifica è attiva</p>
+              <h4 className="text-sm font-bold text-foreground">Formato di Transcodifica</h4>
+              <p className="text-xs text-muted-foreground">Codec preferito quando la transcodifica è attiva</p>
             </div>
 
             <select
               value={format}
               onChange={(e) => setFormat(e.target.value as TranscodingFormat)}
-              className="bg-zinc-950 text-xs font-semibold text-white px-3.5 py-2 rounded-xl border border-zinc-800 focus:border-indigo-500 focus:outline-none uppercase"
+              className="bg-background text-xs font-semibold text-foreground px-3.5 py-2 rounded-xl border border-border focus:border-primary focus:outline-none uppercase"
             >
               <option value="raw">Raw / Automatico</option>
               <option value="mp3">MP3</option>
@@ -422,16 +431,16 @@ export default function SettingsPage() {
           </div>
 
           {/* ReplayGain Mode */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-4 border-t border-zinc-800/60">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-4 border-t border-border">
             <div>
-              <h4 className="text-sm font-bold text-white">ReplayGain (Normalizzazione Volume)</h4>
-              <p className="text-xs text-zinc-400">Livella automaticamente il volume tra brani o album</p>
+              <h4 className="text-sm font-bold text-foreground">ReplayGain (Normalizzazione Volume)</h4>
+              <p className="text-xs text-muted-foreground">Livella automaticamente il volume tra brani o album</p>
             </div>
 
             <select
               value={replayGainMode}
               onChange={(e) => setReplayGainMode(e.target.value as "track" | "album" | "off")}
-              className="bg-zinc-950 text-xs font-semibold text-white px-3.5 py-2 rounded-xl border border-zinc-800 focus:border-indigo-500 focus:outline-none"
+              className="bg-background text-xs font-semibold text-foreground px-3.5 py-2 rounded-xl border border-border focus:border-primary focus:outline-none"
             >
               <option value="track">Track Gain (Singolo Brano)</option>
               <option value="album">Album Gain (Intero Album)</option>
@@ -440,54 +449,56 @@ export default function SettingsPage() {
           </div>
 
           {/* Auto Scrobble Toggle */}
-          <div className="flex items-center justify-between pt-4 border-t border-zinc-800/60">
+          <div className="flex items-center justify-between pt-4 border-t border-border">
             <div>
-              <h4 className="text-sm font-bold text-white">Scrobble Automatico a Navidrome</h4>
-              <p className="text-xs text-zinc-400">Registra gli ascolti e aggiorna le statistiche su Last.fm / ListenBrainz</p>
+              <h4 className="text-sm font-bold text-foreground">Scrobble Automatico a Navidrome</h4>
+              <p className="text-xs text-muted-foreground">Registra gli ascolti e aggiorna le statistiche su Last.fm / ListenBrainz</p>
             </div>
 
             <input
               type="checkbox"
               checked={autoScrobble}
               onChange={(e) => setAutoScrobble(e.target.checked)}
-              className="w-5 h-5 accent-indigo-600 rounded cursor-pointer"
+              className="w-5 h-5 accent-primary rounded cursor-pointer"
             />
           </div>
         </div>
       </section>
 
-      {/* 4. Cache & Storage Section */}
+      {/* 5. Cache & Storage Section */}
       <section className="space-y-4">
         <div className="flex items-center gap-2.5">
-          <HardDrive size={20} className="text-indigo-400" />
-          <h2 className="text-lg font-bold text-white">Cache Locale & Spazio Offline</h2>
+          <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20">
+            <HardDrive size={18} />
+          </div>
+          <h2 className="text-lg font-bold text-foreground">Cache Locale & Spazio Offline</h2>
         </div>
 
-        <div className="p-6 rounded-2xl bg-zinc-900/40 border border-zinc-800 space-y-6">
+        <div className="p-6 rounded-2xl bg-card border border-border space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="text-sm font-bold text-white">Smart LRU Cache</h4>
-              <p className="text-xs text-zinc-400">Salva automaticamente i brani ascoltati per riascolto offline immediato</p>
+              <h4 className="text-sm font-bold text-foreground">Smart LRU Cache</h4>
+              <p className="text-xs text-muted-foreground">Salva automaticamente i brani ascoltati per riascolto offline immediato</p>
             </div>
 
             <input
               type="checkbox"
               checked={autoCacheStreamed}
               onChange={(e) => setAutoCacheStreamed(e.target.checked)}
-              className="w-5 h-5 accent-indigo-600 rounded cursor-pointer"
+              className="w-5 h-5 accent-primary rounded cursor-pointer"
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-4 border-t border-zinc-800/60">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-4 border-t border-border">
             <div>
-              <h4 className="text-sm font-bold text-white">Dimensione Massima Cache</h4>
-              <p className="text-xs text-zinc-400">I brani più vecchi verranno eliminati al raggiungimento della quota</p>
+              <h4 className="text-sm font-bold text-foreground">Dimensione Massima Cache</h4>
+              <p className="text-xs text-muted-foreground">I brani più vecchi verranno eliminati al raggiungimento della quota</p>
             </div>
 
             <select
               value={maxCacheSizeGB}
               onChange={(e) => setMaxCacheSizeGB(parseInt(e.target.value, 10))}
-              className="bg-zinc-950 text-xs font-semibold text-white px-3.5 py-2 rounded-xl border border-zinc-800 focus:border-indigo-500 focus:outline-none"
+              className="bg-background text-xs font-semibold text-foreground px-3.5 py-2 rounded-xl border border-border focus:border-primary focus:outline-none"
             >
               <option value="1">1 GB</option>
               <option value="2">2 GB (Consigliato)</option>
@@ -497,7 +508,7 @@ export default function SettingsPage() {
             </select>
           </div>
 
-          <div className="flex justify-end pt-4 border-t border-zinc-800/60">
+          <div className="flex justify-end pt-4 border-t border-border">
             <button
               onClick={async () => {
                 if (confirm("Vuoi cancellare tutta la musica scaricata in locale?")) {
@@ -505,7 +516,7 @@ export default function SettingsPage() {
                   alert("Cache svuotata con successo!");
                 }
               }}
-              className="px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold border border-red-500/20 transition-colors"
+              className="px-4 py-2 rounded-xl bg-destructive/10 hover:bg-destructive/20 text-destructive text-xs font-semibold border border-destructive/20 transition-colors cursor-pointer"
             >
               Cancella Tutti i Dati Locali
             </button>

@@ -219,16 +219,16 @@ function MusicPageContent() {
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+              <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
                 Musica
               </h1>
               {isOffline && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/30">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 text-xs font-semibold border border-amber-500/30">
                   <WifiOff size={11} /> Offline
                 </span>
               )}
             </div>
-            <p className="text-xs text-zinc-400">
+            <p className="text-xs text-muted-foreground">
               {isOffline
                 ? "Visualizzazione contenuti scaricati sul dispositivo"
                 : "Esplora la tua libreria, generi, album e collezioni personali"}
@@ -239,13 +239,13 @@ function MusicPageContent() {
           <div className="hidden sm:flex items-center gap-2">
             <Link
               href="/starred"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 text-pink-400 border border-pink-500/20 text-xs font-semibold transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-xs font-semibold transition-all"
             >
               <Heart size={14} className="fill-current" /> Preferiti
             </Link>
             <Link
               href="/downloads"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 text-xs font-semibold transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 text-xs font-semibold transition-all"
             >
               <Download size={14} /> Offline
             </Link>
@@ -256,20 +256,20 @@ function MusicPageContent() {
         <div className="flex sm:hidden items-center gap-2 overflow-x-auto pb-1">
           <Link
             href="/starred"
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/20 text-xs font-medium shrink-0 active:scale-95 transition-transform"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-medium shrink-0 active:scale-95 transition-transform"
           >
             <Heart size={13} className="fill-current" /> Brani Preferiti
           </Link>
           <Link
             href="/downloads"
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-medium shrink-0 active:scale-95 transition-transform"
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-medium shrink-0 active:scale-95 transition-transform"
           >
             <Download size={13} /> Musica Offline
           </Link>
         </div>
 
         {/* Segmented Control Bar */}
-        <div className="flex p-1 bg-zinc-900/90 backdrop-blur-md rounded-2xl border border-zinc-800/80 max-w-full overflow-x-auto select-none">
+        <div className="flex p-1 bg-secondary/80 backdrop-blur-md rounded-2xl border border-border max-w-full overflow-x-auto select-none">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isCurrent = activeTab === tab.id;
@@ -277,13 +277,13 @@ function MusicPageContent() {
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex-1 min-w-[75px] py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200 ${
+                className={`flex-1 min-w-[75px] py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer ${
                   isCurrent
-                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
-                    : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                 }`}
               >
-                <Icon size={16} className={isCurrent ? "text-white" : "text-zinc-400"} />
+                <Icon size={16} className={isCurrent ? "text-primary-foreground" : "text-muted-foreground"} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -295,16 +295,16 @@ function MusicPageContent() {
       {activeTab === "explore" && (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {loadingExplore ? (
-            <div className="flex items-center justify-center py-24 text-zinc-400 gap-3">
-              <Loader2 size={28} className="animate-spin text-indigo-400" />
+            <div className="flex items-center justify-center py-24 text-muted-foreground gap-3">
+              <Loader2 size={28} className="animate-spin text-primary" />
               <p className="text-sm">Caricamento generi e suggerimenti...</p>
             </div>
           ) : (
             <>
               {/* Genres Section */}
               <section className="space-y-3">
-                <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Music2 size={18} className="text-indigo-400" /> Generi Musicali
+                <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+                  <Music2 size={18} className="text-primary" /> Generi Musicali
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-3">
                   {genres.map((genre, idx) => {
@@ -330,8 +330,8 @@ function MusicPageContent() {
 
               {/* Random Picks */}
               <section className="space-y-3">
-                <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Sparkles size={18} className="text-pink-400" /> Scoperte Casuali
+                <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+                  <Sparkles size={18} className="text-pink-500" /> Scoperte Casuali
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                   {randomAlbums.map((album) => (
@@ -349,8 +349,8 @@ function MusicPageContent() {
         <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {/* Filter Bar */}
           <div className="flex items-center justify-between gap-2 overflow-x-auto pb-1">
-            <div className="flex items-center gap-1.5 bg-zinc-900/80 p-1 rounded-xl border border-zinc-800 shrink-0">
-              <Filter size={13} className="text-zinc-400 ml-1.5 mr-0.5" />
+            <div className="flex items-center gap-1.5 bg-secondary p-1 rounded-xl border border-border shrink-0">
+              <Filter size={13} className="text-muted-foreground ml-1.5 mr-0.5" />
               {(
                 [
                   { key: "recent", label: "Recenti" },
@@ -362,17 +362,17 @@ function MusicPageContent() {
                 <button
                   key={f.key}
                   onClick={() => setAlbumSort(f.key)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     albumSort === f.key
-                      ? "bg-indigo-600 text-white shadow-sm"
-                      : "text-zinc-400 hover:text-white"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {f.label}
                 </button>
               ))}
             </div>
-            <span className="text-xs text-zinc-500 font-medium hidden sm:inline">
+            <span className="text-xs text-muted-foreground font-medium hidden sm:inline">
               {albums.length} dischi caricati
             </span>
           </div>
@@ -381,13 +381,13 @@ function MusicPageContent() {
           {loadingAlbums ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="aspect-square bg-zinc-900/60 rounded-2xl animate-pulse" />
+                <div key={i} className="aspect-square bg-secondary rounded-2xl animate-pulse" />
               ))}
             </div>
           ) : albums.length === 0 ? (
-            <div className="text-center py-20 text-zinc-500">
+            <div className="text-center py-20 text-muted-foreground">
               <Disc3 size={40} className="mx-auto mb-2 opacity-30" />
-              <p className="text-sm font-medium">Nessun album trovato</p>
+              <p className="text-sm font-medium text-foreground">Nessun album trovato</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
@@ -404,13 +404,13 @@ function MusicPageContent() {
         <div className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
           {/* Search artists input */}
           <div className="relative max-w-sm w-full">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <input
               type="text"
               value={artistFilter}
               onChange={(e) => setArtistFilter(e.target.value)}
               placeholder="Filtra per nome artista..."
-              className="w-full bg-zinc-900/90 text-xs sm:text-sm text-white placeholder-zinc-500 rounded-xl pl-9 pr-4 py-2 border border-zinc-800 focus:border-indigo-500 focus:outline-none transition-colors"
+              className="w-full bg-card text-xs sm:text-sm text-foreground placeholder:text-muted-foreground rounded-xl pl-9 pr-4 py-2 border border-border focus:border-primary focus:outline-none transition-colors"
             />
           </div>
 
@@ -418,16 +418,16 @@ function MusicPageContent() {
           {loadingArtists ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="flex flex-col items-center gap-2 p-3 bg-zinc-900/40 rounded-2xl animate-pulse">
-                  <div className="w-24 h-24 rounded-full bg-zinc-800" />
-                  <div className="w-20 h-3 bg-zinc-800 rounded" />
+                <div key={i} className="flex flex-col items-center gap-2 p-3 bg-secondary/50 rounded-2xl animate-pulse">
+                  <div className="w-24 h-24 rounded-full bg-muted" />
+                  <div className="w-20 h-3 bg-muted rounded" />
                 </div>
               ))}
             </div>
           ) : filteredArtists.length === 0 ? (
-            <div className="text-center py-20 text-zinc-500">
+            <div className="text-center py-20 text-muted-foreground">
               <Users size={40} className="mx-auto mb-2 opacity-30" />
-              <p className="text-sm font-medium">Nessun artista trovato</p>
+              <p className="text-sm font-medium text-foreground">Nessun artista trovato</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
@@ -445,13 +445,13 @@ function MusicPageContent() {
           {loadingPlaylists ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
               {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="aspect-square bg-zinc-900/60 rounded-2xl animate-pulse" />
+                <div key={i} className="aspect-square bg-secondary rounded-2xl animate-pulse" />
               ))}
             </div>
           ) : playlists.length === 0 ? (
-            <div className="text-center py-20 text-zinc-500">
+            <div className="text-center py-20 text-muted-foreground">
               <ListMusic size={40} className="mx-auto mb-2 opacity-30" />
-              <p className="text-sm font-medium">Nessuna playlist presente sul server</p>
+              <p className="text-sm font-medium text-foreground">Nessuna playlist presente sul server</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
@@ -470,8 +470,8 @@ export default function MusicPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center py-32 text-zinc-400 gap-3">
-          <Loader2 size={32} className="animate-spin text-indigo-400" />
+        <div className="flex items-center justify-center py-32 text-muted-foreground gap-3">
+          <Loader2 size={32} className="animate-spin text-primary" />
           <p className="text-sm">Caricamento Musica...</p>
         </div>
       }

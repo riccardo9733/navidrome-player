@@ -43,9 +43,9 @@ export function ArtistCard({ artist }: ArtistCardProps) {
   return (
     <Link
       href={`/artists/${artist.id}`}
-      className="group flex flex-col items-center p-4 rounded-2xl bg-zinc-900/30 hover:bg-zinc-800/50 border border-zinc-800/30 hover:border-zinc-700/50 transition-all duration-300 text-center"
+      className="group flex flex-col items-center p-4 rounded-2xl bg-card border border-border hover:border-primary/40 transition-all duration-300 text-center shadow-xs hover:shadow-md cursor-pointer"
     >
-      <div className="relative w-32 h-32 md:w-36 md:h-36 rounded-full overflow-hidden bg-zinc-800 shadow-xl border-2 border-transparent group-hover:border-indigo-500/50 transition-all duration-300 shrink-0">
+      <div className="relative w-32 h-32 md:w-36 md:h-36 rounded-full overflow-hidden bg-secondary shadow-xl border-2 border-transparent group-hover:border-primary/50 transition-all duration-300 shrink-0">
         {imageUrl && !imgError ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -69,10 +69,10 @@ export function ArtistCard({ artist }: ArtistCardProps) {
         )}
       </div>
 
-      <h3 className="mt-3 text-sm font-semibold text-white group-hover:text-indigo-400 transition-colors truncate max-w-full">
+      <h3 className="mt-3 text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate max-w-full">
         {artist.name}
       </h3>
-      <span className="text-xs text-zinc-500 mt-0.5">
+      <span className="text-xs text-muted-foreground mt-0.5">
         {artist.albumCount ? `${artist.albumCount} album` : "Artista"}
       </span>
     </Link>

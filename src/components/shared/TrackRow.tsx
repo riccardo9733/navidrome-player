@@ -98,21 +98,21 @@ export function TrackRow({
       onClick={handlePlayClick}
       className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors cursor-pointer select-none ${
         isCurrentTrack
-          ? "bg-indigo-600/15 text-indigo-400 font-medium"
-          : "hover:bg-zinc-800/60 text-zinc-300"
+          ? "bg-primary/15 text-primary font-medium"
+          : "hover:bg-secondary text-foreground/90"
       }`}
     >
       {/* Track Index or Playing Indicator */}
       <div className="w-8 flex items-center justify-center shrink-0">
         {isCurrentlyPlaying ? (
           <div className="flex items-end gap-0.5 h-4">
-            <span className="w-1 bg-indigo-500 rounded-full animate-[bounce_1s_infinite_100ms] h-full" />
-            <span className="w-1 bg-indigo-500 rounded-full animate-[bounce_1s_infinite_300ms] h-3/4" />
-            <span className="w-1 bg-indigo-500 rounded-full animate-[bounce_1s_infinite_200ms] h-1/2" />
+            <span className="w-1 bg-primary rounded-full animate-[bounce_1s_infinite_100ms] h-full" />
+            <span className="w-1 bg-primary rounded-full animate-[bounce_1s_infinite_300ms] h-3/4" />
+            <span className="w-1 bg-primary rounded-full animate-[bounce_1s_infinite_200ms] h-1/2" />
           </div>
         ) : (
           <>
-            <span className="text-xs text-zinc-500 font-mono group-hover:hidden">
+            <span className="text-xs text-muted-foreground font-mono group-hover:hidden">
               {showTrackNumber && song.track ? song.track : index !== undefined ? index + 1 : <Music size={14} />}
             </span>
             <button
@@ -120,7 +120,7 @@ export function TrackRow({
                 e.stopPropagation();
                 handlePlayClick();
               }}
-              className="hidden group-hover:flex items-center justify-center text-white"
+              className="hidden group-hover:flex items-center justify-center text-foreground"
             >
               {isCurrentTrack && isPlaying ? <Pause size={16} /> : <Play size={16} className="ml-0.5 fill-current" />}
             </button>
@@ -130,7 +130,7 @@ export function TrackRow({
 
       {/* Cover Art */}
       {showCover && (
-        <div className="relative w-11 h-11 rounded-lg overflow-hidden shrink-0 bg-zinc-800 shadow-md">
+        <div className="relative w-11 h-11 rounded-lg overflow-hidden shrink-0 bg-secondary shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={coverUrl} alt={song.title} className="w-full h-full object-cover" />
         </div>
@@ -138,22 +138,22 @@ export function TrackRow({
 
       {/* Title & Artist */}
       <div className="flex-1 min-w-0">
-        <p className={`text-sm truncate font-medium ${isCurrentTrack ? "text-indigo-400 font-semibold" : "text-white"}`}>
+        <p className={`text-sm truncate font-medium ${isCurrentTrack ? "text-primary font-semibold" : "text-foreground"}`}>
           {song.title}
         </p>
-        <p className="text-xs text-zinc-400 truncate">
+        <p className="text-xs text-muted-foreground truncate">
           {song.artist || "Artista Sconosciuto"}
         </p>
       </div>
 
       {/* Album (Desktop only) */}
       {showAlbum && (
-        <div className="hidden md:block flex-1 min-w-0 text-xs text-zinc-400 truncate">
+        <div className="hidden md:block flex-1 min-w-0 text-xs text-muted-foreground truncate">
           {song.albumId ? (
             <Link
               href={`/albums/${song.albumId}`}
               onClick={(e) => e.stopPropagation()}
-              className="hover:underline hover:text-zinc-200"
+              className="hover:underline hover:text-foreground"
             >
               {song.album || "—"}
             </Link>
@@ -169,18 +169,18 @@ export function TrackRow({
         <button
           onClick={handleDownloadToggle}
           title={isDownloaded ? "Scaricato offline" : isDownloading ? "Download in corso..." : "Scarica offline"}
-          className={`p-1.5 rounded-lg transition-colors ${
+          className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
             isDownloaded
-              ? "text-emerald-400 bg-emerald-500/10"
+              ? "text-primary bg-primary/10"
               : isDownloading
-              ? "text-indigo-400 opacity-100"
-              : "text-zinc-400 md:text-zinc-500 hover:text-zinc-200 opacity-100 md:opacity-0 md:group-hover:opacity-100"
+              ? "text-primary opacity-100"
+              : "text-muted-foreground hover:text-foreground opacity-100 md:opacity-0 md:group-hover:opacity-100"
           }`}
         >
           {isDownloaded ? (
             <Check size={15} />
           ) : isDownloading ? (
-            <Loader2 size={15} className="animate-spin text-indigo-400" />
+            <Loader2 size={15} className="animate-spin text-primary" />
           ) : (
             <Download size={15} />
           )}
@@ -189,17 +189,18 @@ export function TrackRow({
         {/* Favorite Heart */}
         <button
           onClick={handleStarToggle}
-          className={`p-1.5 rounded-lg transition-colors ${
+          title={isStarred ? "Rimuovi dai preferiti" : "Aggiungi ai preferiti"}
+          className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
             isStarred
-              ? "text-pink-500"
-              : "hidden sm:block text-zinc-500 hover:text-zinc-300 opacity-0 group-hover:opacity-100"
+              ? "text-primary"
+              : "hidden sm:block text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"
           }`}
         >
           <Heart size={15} className={isStarred ? "fill-current" : ""} />
         </button>
 
         {/* Duration */}
-        <span className="hidden sm:inline-block text-xs font-mono text-zinc-500 w-10 text-right">
+        <span className="hidden sm:inline-block text-xs font-mono text-muted-foreground w-10 text-right">
           {formatDuration(song.duration)}
         </span>
 
@@ -210,7 +211,7 @@ export function TrackRow({
               e.stopPropagation();
               setMenuOpen(!menuOpen);
             }}
-            className="p-1.5 text-zinc-400 md:text-zinc-500 hover:text-zinc-200 rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+            className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity cursor-pointer"
           >
             <MoreVertical size={16} />
           </button>
@@ -224,16 +225,16 @@ export function TrackRow({
                   setMenuOpen(false);
                 }}
               />
-              <div className="absolute right-0 top-full mt-1 w-48 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl z-50 py-1.5 text-xs text-zinc-200 animate-in fade-in zoom-in-95">
+              <div className="absolute right-0 top-full mt-1 w-48 bg-card border border-border rounded-xl shadow-2xl z-50 py-1.5 text-xs text-foreground animate-in fade-in zoom-in-95">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     addToQueue(song, true);
                     setMenuOpen(false);
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-zinc-800 text-left"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-secondary text-left cursor-pointer"
                 >
-                  <Radio size={14} className="text-indigo-400" /> Riproduci come prossimo
+                  <Radio size={14} className="text-primary" /> Riproduci come prossimo
                 </button>
                 <button
                   onClick={(e) => {
@@ -241,9 +242,9 @@ export function TrackRow({
                     addToQueue(song, false);
                     setMenuOpen(false);
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-zinc-800 text-left"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-secondary text-left cursor-pointer"
                 >
-                  <ListPlus size={14} className="text-indigo-400" /> Aggiungi in coda
+                  <ListPlus size={14} className="text-primary" /> Aggiungi in coda
                 </button>
                 {song.artistId && (
                   <Link
@@ -252,9 +253,9 @@ export function TrackRow({
                       e.stopPropagation();
                       setMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-zinc-800 text-left"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-secondary text-left"
                   >
-                    <User size={14} className="text-indigo-400" /> Vai all&apos;artista
+                    <User size={14} className="text-primary" /> Vai all&apos;artista
                   </Link>
                 )}
                 {song.albumId && (
@@ -264,9 +265,9 @@ export function TrackRow({
                       e.stopPropagation();
                       setMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-zinc-800 text-left"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-secondary text-left"
                   >
-                    <Music size={14} className="text-indigo-400" /> Vai all&apos;album
+                    <Music size={14} className="text-primary" /> Vai all&apos;album
                   </Link>
                 )}
               </div>

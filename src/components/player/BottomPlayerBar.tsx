@@ -105,12 +105,12 @@ export function BottomPlayerBar() {
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="hidden md:flex fixed bottom-0 left-0 right-0 h-24 glass-player z-40 px-6 items-center justify-between border-t border-zinc-800/80 select-none shadow-2xl">
+    <div className="hidden md:flex fixed bottom-0 left-0 right-0 h-24 glass-player z-40 px-6 items-center justify-between border-t border-border select-none shadow-2xl transition-colors duration-200">
       {/* 1. Track Info & Actions (Left) */}
       <div className="flex items-center gap-4 w-1/4 min-w-[220px]">
         <div
           onClick={() => setFullscreenOpen(true)}
-          className="relative w-14 h-14 rounded-xl overflow-hidden bg-zinc-800 shrink-0 cursor-pointer group shadow-md"
+          className="relative w-14 h-14 rounded-xl overflow-hidden bg-secondary shrink-0 cursor-pointer group shadow-md"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={coverUrl} alt={currentSong.title} className="w-full h-full object-cover" />
@@ -122,11 +122,11 @@ export function BottomPlayerBar() {
         <div className="flex flex-col min-w-0">
           <span
             onClick={() => setFullscreenOpen(true)}
-            className="text-sm font-semibold text-white truncate cursor-pointer hover:underline"
+            className="text-sm font-semibold text-foreground truncate cursor-pointer hover:underline"
           >
             {currentSong.title}
           </span>
-          <span className="text-xs text-zinc-400 truncate hover:text-zinc-200">
+          <span className="text-xs text-muted-foreground truncate hover:text-foreground">
             {currentSong.artistId ? (
               <Link href={`/artists/${currentSong.artistId}`} className="hover:underline">
                 {currentSong.artist || "Artista Sconosciuto"}
@@ -140,8 +140,8 @@ export function BottomPlayerBar() {
         <div className="flex items-center gap-1 shrink-0 ml-1">
           <button
             onClick={handleStarToggle}
-            className={`p-2 rounded-lg hover:bg-zinc-800 transition-colors ${
-              isStarred ? "text-pink-500" : "text-zinc-400 hover:text-white"
+            className={`p-2 rounded-lg hover:bg-secondary transition-colors cursor-pointer ${
+              isStarred ? "text-primary" : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <Heart size={18} className={isStarred ? "fill-current" : ""} />
@@ -149,12 +149,12 @@ export function BottomPlayerBar() {
 
           <button
             onClick={handleDownloadToggle}
-            className={`p-2 rounded-lg hover:bg-zinc-800 transition-colors ${
+            className={`p-2 rounded-lg hover:bg-secondary transition-colors cursor-pointer ${
               isDownloaded
-                ? "text-emerald-400"
+                ? "text-primary"
                 : downloading
-                ? "text-indigo-400 animate-pulse"
-                : "text-zinc-400 hover:text-white"
+                ? "text-primary animate-pulse"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {isDownloaded ? <Check size={18} /> : <Download size={18} />}
@@ -168,8 +168,8 @@ export function BottomPlayerBar() {
         <div className="flex items-center gap-5">
           <button
             onClick={toggleShuffle}
-            className={`p-1.5 rounded-lg transition-colors ${
-              isShuffled ? "text-indigo-400" : "text-zinc-400 hover:text-white"
+            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+              isShuffled ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
             }`}
             title="Riproduzione casuale"
           >
@@ -178,7 +178,7 @@ export function BottomPlayerBar() {
 
           <button
             onClick={previousTrack}
-            className="text-zinc-300 hover:text-white transition-colors p-1"
+            className="text-foreground/80 hover:text-foreground transition-colors p-1 cursor-pointer"
             title="Precedente"
           >
             <SkipBack size={20} className="fill-current" />
@@ -186,7 +186,7 @@ export function BottomPlayerBar() {
 
           <button
             onClick={togglePlay}
-            className="w-11 h-11 rounded-full bg-white hover:bg-zinc-200 text-black flex items-center justify-center shadow-lg transition-transform hover:scale-105"
+            className="w-11 h-11 rounded-full bg-primary hover:opacity-90 text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/25 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
             title={isPlaying ? "Pausa" : "Riproduci"}
           >
             {isPlaying ? <Pause size={20} className="fill-current" /> : <Play size={20} className="ml-0.5 fill-current" />}
@@ -194,7 +194,7 @@ export function BottomPlayerBar() {
 
           <button
             onClick={nextTrack}
-            className="text-zinc-300 hover:text-white transition-colors p-1"
+            className="text-foreground/80 hover:text-foreground transition-colors p-1 cursor-pointer"
             title="Successivo"
           >
             <SkipForward size={20} className="fill-current" />
@@ -202,8 +202,8 @@ export function BottomPlayerBar() {
 
           <button
             onClick={cycleRepeatMode}
-            className={`p-1.5 rounded-lg transition-colors ${
-              repeatMode !== "off" ? "text-indigo-400" : "text-zinc-400 hover:text-white"
+            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+              repeatMode !== "off" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
             }`}
             title={`Ripeti: ${repeatMode}`}
           >
@@ -212,13 +212,13 @@ export function BottomPlayerBar() {
         </div>
 
         {/* Seekbar */}
-        <div className="flex items-center gap-3 w-full text-xs font-mono text-zinc-400">
+        <div className="flex items-center gap-3 w-full text-xs font-mono text-muted-foreground">
           <span className="w-10 text-right">{formatDuration(currentTime)}</span>
 
           <div className="relative flex-1 flex items-center group py-1">
-            <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
               <div
-                className="h-full bg-indigo-500 group-hover:bg-indigo-400 transition-all rounded-full"
+                className="h-full bg-primary transition-all rounded-full"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -241,8 +241,8 @@ export function BottomPlayerBar() {
       <div className="flex items-center justify-end gap-3 w-1/4 min-w-[220px]">
         <button
           onClick={() => setLyricsOpen(!isLyricsOpen)}
-          className={`p-2 rounded-lg transition-colors ${
-            isLyricsOpen ? "text-indigo-400 bg-indigo-500/15" : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+          className={`p-2 rounded-lg transition-colors cursor-pointer ${
+            isLyricsOpen ? "text-primary bg-primary/15" : "text-muted-foreground hover:text-foreground hover:bg-secondary"
           }`}
           title="Testi sincronizzati"
         >
@@ -251,8 +251,8 @@ export function BottomPlayerBar() {
 
         <button
           onClick={() => setQueueOpen(!isQueueOpen)}
-          className={`p-2 rounded-lg transition-colors ${
-            isQueueOpen ? "text-indigo-400 bg-indigo-500/15" : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+          className={`p-2 rounded-lg transition-colors cursor-pointer ${
+            isQueueOpen ? "text-primary bg-primary/15" : "text-muted-foreground hover:text-foreground hover:bg-secondary"
           }`}
           title="Coda di riproduzione"
         >
@@ -261,8 +261,8 @@ export function BottomPlayerBar() {
 
         <button
           onClick={() => setEqualizerOpen(!isEqualizerOpen)}
-          className={`p-2 rounded-lg transition-colors ${
-            isEqualizerOpen ? "text-indigo-400 bg-indigo-500/15" : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+          className={`p-2 rounded-lg transition-colors cursor-pointer ${
+            isEqualizerOpen ? "text-primary bg-primary/15" : "text-muted-foreground hover:text-foreground hover:bg-secondary"
           }`}
           title="Equalizzatore"
         >
@@ -273,7 +273,7 @@ export function BottomPlayerBar() {
         <div className="flex items-center gap-2 w-28 group">
           <button
             onClick={toggleMute}
-            className="text-zinc-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
           >
             {isMuted || volume === 0 ? (
               <VolumeX size={18} />
@@ -285,9 +285,9 @@ export function BottomPlayerBar() {
           </button>
 
           <div className="relative flex-1 flex items-center py-1">
-            <div className="w-full h-1 bg-zinc-800 rounded-full overflow-hidden">
+            <div className="w-full h-1 bg-secondary rounded-full overflow-hidden">
               <div
-                className="h-full bg-zinc-300 group-hover:bg-indigo-400 transition-all rounded-full"
+                className="h-full bg-primary/70 group-hover:bg-primary transition-all rounded-full"
                 style={{ width: `${isMuted ? 0 : volume * 100}%` }}
               />
             </div>
@@ -305,7 +305,7 @@ export function BottomPlayerBar() {
 
         <button
           onClick={() => setFullscreenOpen(!isFullscreenOpen)}
-          className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+          className="p-2 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors cursor-pointer"
           title="A tutto schermo"
         >
           <Maximize2 size={18} />

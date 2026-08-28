@@ -20,6 +20,7 @@ import { usePlayerStore } from "../../store/usePlayerStore";
 import { subsonicClient } from "../../lib/subsonic/client";
 import { Song, Album, Artist } from "../../lib/subsonic/types";
 import { formatDuration } from "../../lib/utils/formatters";
+import { QuickThemeSwitcher } from "../theme/QuickThemeSwitcher";
 
 function LiveSearchBarInner() {
   const router = useRouter();
@@ -131,7 +132,7 @@ function LiveSearchBarInner() {
           <Search
             size={17}
             className={`absolute left-3.5 pointer-events-none transition-colors ${
-              isOpen ? "text-indigo-400" : "text-zinc-400"
+              isOpen ? "text-primary" : "text-muted-foreground"
             }`}
           />
           <input
@@ -153,18 +154,18 @@ function LiveSearchBarInner() {
               }
             }}
             placeholder="Cerca brani, artisti o album in tempo reale..."
-            className="w-full bg-zinc-900/90 hover:bg-zinc-900 focus:bg-zinc-900 text-sm text-white placeholder-zinc-500 rounded-full pl-10 pr-10 py-2 border border-zinc-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 focus:outline-none transition-all shadow-inner"
+            className="w-full bg-card hover:bg-secondary/60 focus:bg-card text-sm text-foreground placeholder:text-muted-foreground rounded-full pl-10 pr-10 py-2 border border-border focus:border-primary focus:ring-1 focus:ring-primary/40 focus:outline-none transition-all shadow-xs"
           />
           {isLoading ? (
             <Loader2
               size={16}
-              className="absolute right-3.5 animate-spin text-indigo-400"
+              className="absolute right-3.5 animate-spin text-primary"
             />
           ) : searchQuery ? (
             <button
               type="button"
               onClick={handleClear}
-              className="absolute right-3 p-1 rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+              className="absolute right-3 p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer"
               title="Cancella"
             >
               <X size={14} />
@@ -175,18 +176,18 @@ function LiveSearchBarInner() {
 
       {/* Live Search Dropdown Popup */}
       {isOpen && searchQuery.trim().length > 0 && pathname !== "/search" && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-800 shadow-2xl rounded-2xl overflow-hidden z-50 max-h-[75vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150 divide-y divide-zinc-800/60">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-popover/95 text-popover-foreground backdrop-blur-2xl border border-border shadow-2xl rounded-2xl overflow-hidden z-50 max-h-[75vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-150 divide-y divide-border">
           {isLoading && !hasAnyResults ? (
-            <div className="p-8 text-center text-zinc-400 flex flex-col items-center gap-3">
-              <Loader2 size={24} className="animate-spin text-indigo-400" />
+            <div className="p-8 text-center text-muted-foreground flex flex-col items-center gap-3">
+              <Loader2 size={24} className="animate-spin text-primary" />
               <p className="text-sm">Ricerca in corso...</p>
             </div>
           ) : !hasAnyResults && !isLoading ? (
-            <div className="p-8 text-center text-zinc-500 space-y-1">
-              <p className="text-sm font-medium text-zinc-400">
+            <div className="p-8 text-center text-muted-foreground space-y-1">
+              <p className="text-sm font-medium text-foreground">
                 Nessun risultato per &quot;{searchQuery}&quot;
               </p>
-              <p className="text-xs text-zinc-500">
+              <p className="text-xs text-muted-foreground">
                 Prova a verificare l&apos;ortografia o usa termini più generali.
               </p>
             </div>
@@ -195,8 +196,8 @@ function LiveSearchBarInner() {
               {/* Songs section */}
               {hasSongs && (
                 <div className="p-3">
-                  <div className="flex items-center gap-1.5 px-2 py-1 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                    <Music2 size={13} className="text-indigo-400" /> Brani
+                  <div className="flex items-center gap-1.5 px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    <Music2 size={13} className="text-primary" /> Brani
                   </div>
                   <div className="space-y-1 mt-1">
                     {results!.song!.slice(0, 4).map((song, idx) => {
@@ -211,10 +212,10 @@ function LiveSearchBarInner() {
                           onClick={() =>
                             handleSelectSong(song, results!.song!, idx)
                           }
-                          className="group flex items-center justify-between p-2 rounded-xl hover:bg-zinc-800/80 cursor-pointer transition-colors"
+                          className="group flex items-center justify-between p-2 rounded-xl hover:bg-secondary cursor-pointer transition-colors"
                         >
                           <div className="flex items-center gap-3 min-w-0 flex-1">
-                            <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-zinc-800 shrink-0 flex items-center justify-center">
+                            <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-secondary shrink-0 flex items-center justify-center">
                               {coverUrl ? (
                                 <img
                                   src={coverUrl}
@@ -223,7 +224,7 @@ function LiveSearchBarInner() {
                                   loading="lazy"
                                 />
                               ) : (
-                                <Music2 size={18} className="text-zinc-600" />
+                                <Music2 size={18} className="text-muted-foreground" />
                               )}
                               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                                 <Play size={14} className="text-white fill-current ml-0.5" />
@@ -233,18 +234,18 @@ function LiveSearchBarInner() {
                               <p
                                 className={`text-sm font-medium truncate ${
                                   isCurrent
-                                    ? "text-indigo-400 font-semibold"
-                                    : "text-zinc-200 group-hover:text-white"
+                                    ? "text-primary font-semibold"
+                                    : "text-foreground"
                                 }`}
                               >
                                 {song.title}
                               </p>
-                              <p className="text-xs text-zinc-400 truncate">
+                              <p className="text-xs text-muted-foreground truncate">
                                 {song.artist || "Artista sconosciuto"}
                               </p>
                             </div>
                           </div>
-                          <span className="text-xs text-zinc-500 font-mono pl-3 shrink-0">
+                          <span className="text-xs text-muted-foreground font-mono pl-3 shrink-0">
                             {formatDuration(song.duration || 0)}
                           </span>
                         </div>
@@ -257,8 +258,8 @@ function LiveSearchBarInner() {
               {/* Albums section */}
               {hasAlbums && (
                 <div className="p-3">
-                  <div className="flex items-center gap-1.5 px-2 py-1 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                    <Disc3 size={13} className="text-indigo-400" /> Album
+                  <div className="flex items-center gap-1.5 px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    <Disc3 size={13} className="text-primary" /> Album
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mt-1">
                     {results!.album!.slice(0, 4).map((album) => {
@@ -270,9 +271,9 @@ function LiveSearchBarInner() {
                         <div
                           key={album.id}
                           onClick={() => handleNavigate(`/albums/${album.id}`)}
-                          className="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-zinc-800/80 cursor-pointer transition-colors"
+                          className="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-secondary cursor-pointer transition-colors"
                         >
-                          <div className="w-10 h-10 rounded-lg overflow-hidden bg-zinc-800 shrink-0 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-lg overflow-hidden bg-secondary shrink-0 flex items-center justify-center">
                             {coverUrl ? (
                               <img
                                 src={coverUrl}
@@ -281,14 +282,14 @@ function LiveSearchBarInner() {
                                 loading="lazy"
                               />
                             ) : (
-                              <Disc3 size={18} className="text-zinc-600" />
+                              <Disc3 size={18} className="text-muted-foreground" />
                             )}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-zinc-200 group-hover:text-white truncate">
+                            <p className="text-sm font-medium text-foreground truncate">
                               {album.name}
                             </p>
-                            <p className="text-xs text-zinc-400 truncate">
+                            <p className="text-xs text-muted-foreground truncate">
                               {album.artist} {album.year ? `• ${album.year}` : ""}
                             </p>
                           </div>
@@ -302,8 +303,8 @@ function LiveSearchBarInner() {
               {/* Artists section */}
               {hasArtists && (
                 <div className="p-3">
-                  <div className="flex items-center gap-1.5 px-2 py-1 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                    <Users size={13} className="text-indigo-400" /> Artisti
+                  <div className="flex items-center gap-1.5 px-2 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    <Users size={13} className="text-primary" /> Artisti
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mt-1">
                     {results!.artist!.slice(0, 4).map((artist) => {
@@ -317,9 +318,9 @@ function LiveSearchBarInner() {
                         <div
                           key={artist.id}
                           onClick={() => handleNavigate(`/artists/${artist.id}`)}
-                          className="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-zinc-800/80 cursor-pointer transition-colors"
+                          className="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-secondary cursor-pointer transition-colors"
                         >
-                          <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-800 shrink-0 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full overflow-hidden bg-secondary shrink-0 flex items-center justify-center">
                             {avatarUrl ? (
                               <img
                                 src={avatarUrl}
@@ -328,14 +329,14 @@ function LiveSearchBarInner() {
                                 loading="lazy"
                               />
                             ) : (
-                              <Users size={18} className="text-zinc-600" />
+                              <Users size={18} className="text-muted-foreground" />
                             )}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-zinc-200 group-hover:text-white truncate">
+                            <p className="text-sm font-medium text-foreground truncate">
                               {artist.name}
                             </p>
-                            <p className="text-xs text-zinc-400 truncate">
+                            <p className="text-xs text-muted-foreground truncate">
                               Artista
                             </p>
                           </div>
@@ -355,7 +356,7 @@ function LiveSearchBarInner() {
                     `/search?q=${encodeURIComponent(searchQuery.trim())}`
                   );
                 }}
-                className="w-full p-3 bg-zinc-950/60 hover:bg-indigo-600/20 text-indigo-400 hover:text-indigo-300 text-xs font-medium flex items-center justify-center gap-2 transition-colors border-t border-zinc-800/80"
+                className="w-full p-3 bg-muted/60 hover:bg-primary/15 text-primary text-xs font-medium flex items-center justify-center gap-2 transition-colors border-t border-border cursor-pointer"
               >
                 Visualizza tutti i risultati per &quot;{searchQuery}&quot;
                 <ArrowRight size={14} />
@@ -372,12 +373,12 @@ function LiveSearchBarFallback() {
   return (
     <div className="flex-1 max-w-lg mx-3 md:mx-6 relative">
       <div className="relative flex items-center">
-        <Search size={17} className="absolute left-3.5 text-zinc-400 pointer-events-none" />
+        <Search size={17} className="absolute left-3.5 text-muted-foreground pointer-events-none" />
         <input
           type="text"
           disabled
           placeholder="Cerca brani, artisti o album..."
-          className="w-full bg-zinc-900/90 text-sm text-white placeholder-zinc-500 rounded-full pl-10 pr-10 py-2 border border-zinc-800 focus:outline-none opacity-80 cursor-not-allowed"
+          className="w-full bg-card text-sm text-foreground placeholder:text-muted-foreground rounded-full pl-10 pr-10 py-2 border border-border focus:outline-none opacity-80 cursor-not-allowed"
         />
       </div>
     </div>
@@ -388,29 +389,29 @@ export function Header() {
   const router = useRouter();
 
   return (
-    <header className="flex pt-[env(safe-area-inset-top,0px)] h-[calc(3.5rem+env(safe-area-inset-top,0px))] md:h-16 md:pt-0 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl px-3 md:px-6 items-center justify-between z-40 shrink-0 select-none relative gap-2">
+    <header className="flex pt-[env(safe-area-inset-top,0px)] h-[calc(3.5rem+env(safe-area-inset-top,0px))] md:h-16 md:pt-0 border-b border-border bg-background/80 backdrop-blur-xl px-3 md:px-6 items-center justify-between z-40 shrink-0 select-none relative gap-2 transition-colors duration-200">
       {/* Left: Mobile Brand / Desktop Navigation Arrows */}
       <div className="flex items-center gap-2">
         {/* Mobile Brand Logo */}
         <Link href="/" className="md:hidden flex items-center gap-2 pr-1">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-md shadow-indigo-500/25">
-            <Disc3 size={18} className="text-white animate-[spin_10s_linear_infinite]" />
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-primary via-primary/80 to-accent flex items-center justify-center shadow-md shadow-primary/25">
+            <Disc3 size={18} className="text-primary-foreground animate-[spin_10s_linear_infinite]" />
           </div>
-          <span className="font-extrabold text-sm text-white tracking-tight">Navidrome</span>
+          <span className="font-extrabold text-sm text-foreground tracking-tight">Navidrome</span>
         </Link>
 
         {/* Desktop History Arrows */}
         <div className="hidden md:flex items-center gap-1.5">
           <button
             onClick={() => router.back()}
-            className="w-8 h-8 rounded-full bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-sm"
+            className="w-8 h-8 rounded-full bg-secondary hover:bg-secondary/80 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors shadow-xs"
             title="Indietro"
           >
             <ChevronLeft size={18} />
           </button>
           <button
             onClick={() => router.forward()}
-            className="w-8 h-8 rounded-full bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-sm"
+            className="w-8 h-8 rounded-full bg-secondary hover:bg-secondary/80 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors shadow-xs"
             title="Avanti"
           >
             <ChevronRight size={18} />
@@ -425,16 +426,18 @@ export function Header() {
         </Suspense>
       </div>
 
-      {/* Right: Settings Icon Button */}
+      {/* Right: Quick Theme Switcher & Settings */}
       <div className="flex items-center gap-2">
+        <QuickThemeSwitcher />
+
         <Link
           href="/settings"
-          className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center transition-all shadow-sm active:scale-95 group"
+          className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-secondary/80 hover:bg-secondary border border-border text-foreground/80 hover:text-foreground flex items-center justify-center transition-all shadow-xs active:scale-95 group"
           title="Impostazioni"
         >
           <Settings
             size={18}
-            className="text-zinc-400 group-hover:text-indigo-400 group-hover:rotate-45 transition-all"
+            className="text-muted-foreground group-hover:text-primary group-hover:rotate-45 transition-all"
           />
         </Link>
       </div>
