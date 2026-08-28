@@ -12,8 +12,6 @@ import {
   SubsonicResponse,
   TranscodingFormat,
 } from "./types";
-import { DEMO_ALBUMS, DEMO_ARTISTS, DEMO_LYRICS, DEMO_PLAYLISTS, DEMO_SONGS } from "./demoData";
-
 export class SubsonicClient {
   private profile: ServerProfile | null = null;
 
@@ -101,7 +99,7 @@ export class SubsonicClient {
 
   public async ping(): Promise<{ serverVersion?: string; openSubsonic?: boolean }> {
     if (!this.isConfigured()) {
-      return { serverVersion: "Demo Mode", openSubsonic: true };
+      return { serverVersion: "Offline", openSubsonic: false };
     }
     try {
       const res = await this.request<{ serverVersion?: string; openSubsonic?: boolean; version?: string }>("ping");
@@ -116,7 +114,27 @@ export class SubsonicClient {
 
   public async getArtists(): Promise<Artist[]> {
     if (!this.isConfigured()) {
-      return DEMO_ARTISTS;
+      try {
+        const { db } = await import("../db/dexie");
+        const cachedAlbums = await db.cachedAlbums.toArray();
+        const artistMap = new Map<string, Artist>();
+        cachedAlbums.forEach((ca) => {
+          if (ca.album.artist) {
+            const key = ca.album.artistId || ca.album.artist;
+            if (!artistMap.has(key)) {
+              artistMap.set(key, {
+                id: key,
+                name: ca.album.artist,
+                coverArt: ca.album.coverArt,
+                albumCount: 1,
+              });
+            }
+          }
+        });
+        return Array.from(artistMap.values());
+      } catch {
+        return [];
+      }
     }
     try {
       const res = await this.request<{ artists?: { index?: Array<{ artist?: Artist[] }> } }>("getArtists");
@@ -155,9 +173,21 @@ export class SubsonicClient {
 
   public async getArtist(id: string): Promise<Artist> {
     if (!this.isConfigured()) {
-      const artist = DEMO_ARTISTS.find((a) => a.id === id);
-      if (artist) return artist;
-      return DEMO_ARTISTS[0];
+      try {
+        const { db } = await import("../db/dexie");
+        const cachedAlbums = await db.cachedAlbums.toArray();
+        const albums = cachedAlbums.filter((ca) => ca.album.artistId === id || ca.album.artist === id).map((ca) => ca.album);
+        if (albums.length > 0) {
+          return {
+            id,
+            name: albums[0].artist || id,
+            coverArt: albums[0].coverArt,
+            albumCount: albums.length,
+            album: albums,
+          };
+        }
+      } catch {}
+      throw new Error("Server non configurato");
     }
     try {
       const res = await this.request<{ artist: Artist }>("getArtist", { id });
@@ -188,10 +218,13 @@ export class SubsonicClient {
     offset = 0
   ): Promise<Album[]> {
     if (!this.isConfigured()) {
-      if (type === "starred") {
-        return DEMO_ALBUMS.filter((a) => Boolean(a.starred));
+      try {
+        const { db } = await import("../db/dexie");
+        const cached = await db.cachedAlbums.toArray();
+        return cached.map((c) => c.album);
+      } catch {
+        return [];
       }
-      return DEMO_ALBUMS;
     }
     try {
       const res = await this.request<{ albumList2?: { album?: Album[] }; albumList?: { album?: Album[] } }>(
@@ -213,9 +246,12 @@ export class SubsonicClient {
 
   public async getAlbum(id: string): Promise<Album> {
     if (!this.isConfigured()) {
-      const album = DEMO_ALBUMS.find((a) => a.id === id);
-      if (album) return album;
-      return DEMO_ALBUMS[0];
+      try {
+        const { db } = await import("../db/dexie");
+        const cached = await db.cachedAlbums.get(id);
+        if (cached) return cached.album;
+      } catch {}
+      throw new Error("Server non configurato");
     }
     try {
       const res = await this.request<{ album: Album }>("getAlbum", { id });
@@ -233,7 +269,13 @@ export class SubsonicClient {
 
   public async getPlaylists(): Promise<Playlist[]> {
     if (!this.isConfigured()) {
-      return DEMO_PLAYLISTS;
+      try {
+        const { db } = await import("../db/dexie");
+        const cached = await db.cachedPlaylists.toArray();
+        return cached.map((c) => c.playlist);
+      } catch {
+        return [];
+      }
     }
     try {
       const res = await this.request<{ playlists?: { playlist?: Playlist[] } }>("getPlaylists");
@@ -252,9 +294,12 @@ export class SubsonicClient {
 
   public async getPlaylist(id: string): Promise<Playlist> {
     if (!this.isConfigured()) {
-      const pl = DEMO_PLAYLISTS.find((p) => p.id === id);
-      if (pl) return pl;
-      return DEMO_PLAYLISTS[0];
+      try {
+        const { db } = await import("../db/dexie");
+        const cached = await db.cachedPlaylists.get(id);
+        if (cached) return cached.playlist;
+      } catch {}
+      throw new Error("Server non configurato");
     }
     try {
       const res = await this.request<{ playlist: Playlist }>("getPlaylist", { id });
@@ -273,16 +318,34 @@ export class SubsonicClient {
   public async search(query: string): Promise<SearchResult3["searchResult3"]> {
     if (!query.trim()) return {};
     if (!this.isConfigured()) {
-      const q = query.toLowerCase();
-      return {
-        song: DEMO_SONGS.filter(
-          (s) => s.title.toLowerCase().includes(q) || s.artist?.toLowerCase().includes(q)
-        ),
-        album: DEMO_ALBUMS.filter(
-          (a) => a.name.toLowerCase().includes(q) || a.artist?.toLowerCase().includes(q)
-        ),
-        artist: DEMO_ARTISTS.filter((a) => a.name.toLowerCase().includes(q)),
-      };
+      try {
+        const { db } = await import("../db/dexie");
+        const q = query.toLowerCase();
+        const cachedTracks = await db.cachedTracks.toArray();
+        const cachedAlbums = await db.cachedAlbums.toArray();
+        const matchedSongs = cachedTracks
+          .map((t) => t.song)
+          .filter(
+            (s) =>
+              s.title?.toLowerCase().includes(q) ||
+              s.artist?.toLowerCase().includes(q) ||
+              s.album?.toLowerCase().includes(q)
+          );
+        const matchedAlbums = cachedAlbums
+          .map((a) => a.album)
+          .filter(
+            (a) =>
+              a.name?.toLowerCase().includes(q) ||
+              a.artist?.toLowerCase().includes(q)
+          );
+        return {
+          song: matchedSongs,
+          album: matchedAlbums,
+          artist: [],
+        };
+      } catch {
+        return {};
+      }
     }
     try {
       const res = await this.request<SearchResult3>("search3", {
@@ -327,11 +390,7 @@ export class SubsonicClient {
 
   public async getGenres(): Promise<Genre[]> {
     if (!this.isConfigured()) {
-      return [
-        { value: "Synthwave", songCount: 3, albumCount: 1 },
-        { value: "Lo-Fi", songCount: 2, albumCount: 1 },
-        { value: "Ambient", songCount: 2, albumCount: 1 },
-      ];
+      return [];
     }
     const res = await this.request<{ genres?: { genre?: Genre[] } }>("getGenres");
     return res.genres?.genre || [];
@@ -339,11 +398,7 @@ export class SubsonicClient {
 
   public async getStarred(): Promise<{ song: Song[]; album: Album[]; artist: Artist[] }> {
     if (!this.isConfigured()) {
-      return {
-        song: DEMO_SONGS.filter((s) => Boolean(s.starred)),
-        album: DEMO_ALBUMS.filter((a) => Boolean(a.starred)),
-        artist: DEMO_ARTISTS.filter((ar) => Boolean(ar.starred)),
-      };
+      return { song: [], album: [], artist: [] };
     }
     const res = await this.request<{
       starred2?: { song?: Song[]; album?: Album[]; artist?: Artist[] };
@@ -384,10 +439,6 @@ export class SubsonicClient {
 
   public async getLyrics(songId: string): Promise<{ syncedLyrics?: string; plainLyrics?: string }> {
     if (!this.isConfigured()) {
-      const demoLrc = DEMO_LYRICS[songId];
-      if (demoLrc) {
-        return { syncedLyrics: demoLrc };
-      }
       return {};
     }
 
@@ -448,9 +499,7 @@ export class SubsonicClient {
     }
   ): string {
     if (!this.isConfigured()) {
-      const demo = DEMO_SONGS.find((s) => s.id === songId);
-      if (demo && demo.path) return demo.path;
-      return DEMO_SONGS[0].path || "";
+      return "";
     }
 
     const params: Record<string, string | number | boolean | undefined> = {

@@ -134,8 +134,8 @@ export default function SettingsPage() {
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Connesso a {activeProfile.name}
                   </span>
                 ) : (
-                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold">
-                    Demo Mode (Nessun server)
+                  <span className="px-2.5 py-0.5 rounded-full bg-zinc-800 text-zinc-400 text-xs font-semibold">
+                    Nessun server configurato
                   </span>
                 )}
               </div>
@@ -185,7 +185,7 @@ export default function SettingsPage() {
         <div className="space-y-2">
           {profiles.length === 0 ? (
             <div className="p-6 rounded-2xl bg-zinc-900/40 border border-dashed border-zinc-800 text-center space-y-2">
-              <p className="text-sm font-semibold text-zinc-300">Nessun server collegato (Modalità Demo Attiva)</p>
+              <p className="text-sm font-semibold text-zinc-300">Nessun server collegato</p>
               <p className="text-xs text-zinc-500">
                 Aggiungi il tuo URL Navidrome per ascoltare tutta la tua libreria personale.
               </p>

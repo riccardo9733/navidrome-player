@@ -23,7 +23,7 @@ export function MiniPlayer() {
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="md:hidden fixed bottom-[68px] left-3 right-3 z-30">
+    <div className="md:hidden fixed bottom-[calc(70px+env(safe-area-inset-bottom,0px))] left-3 right-3 z-30">
       <div
         onClick={() => setFullscreenOpen(true)}
         className="relative overflow-hidden rounded-2xl bg-zinc-900/90 backdrop-blur-xl border border-white/10 shadow-2xl p-2 flex items-center gap-3 active:scale-[0.98] transition-transform"

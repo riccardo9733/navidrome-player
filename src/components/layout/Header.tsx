@@ -1,14 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef, Suspense } from "react";
+import Link from "next/link";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   Search,
   ChevronLeft,
   ChevronRight,
-  Server,
-  ShieldCheck,
-  WifiOff,
   X,
   Loader2,
   Music2,
@@ -16,8 +14,8 @@ import {
   Users,
   Play,
   ArrowRight,
+  Settings,
 } from "lucide-react";
-import { useAuthStore } from "../../store/useAuthStore";
 import { usePlayerStore } from "../../store/usePlayerStore";
 import { subsonicClient } from "../../lib/subsonic/client";
 import { Song, Album, Artist } from "../../lib/subsonic/types";
@@ -388,53 +386,57 @@ function LiveSearchBarFallback() {
 
 export function Header() {
   const router = useRouter();
-  const isConnected = useAuthStore((s) => s.isConnected);
-  const isOfflineMode = useAuthStore((s) => s.isOfflineMode);
-  const profiles = useAuthStore((s) => s.profiles);
-  const activeProfileId = useAuthStore((s) => s.activeProfileId);
-
-  const activeProfile = profiles.find((p) => p.id === activeProfileId);
 
   return (
-    <header className="hidden md:flex h-16 border-b border-zinc-800/80 bg-zinc-950/60 backdrop-blur-xl px-4 md:px-6 items-center justify-between z-40 shrink-0 select-none relative">
-      {/* Navigation Arrows */}
+    <header className="flex h-14 md:h-16 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl px-3 md:px-6 items-center justify-between z-40 shrink-0 select-none relative gap-2">
+      {/* Left: Mobile Brand / Desktop Navigation Arrows */}
       <div className="flex items-center gap-2">
-        <button
-          onClick={() => router.back()}
-          className="w-8 h-8 rounded-full bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-sm"
-          title="Indietro"
-        >
-          <ChevronLeft size={18} />
-        </button>
-        <button
-          onClick={() => router.forward()}
-          className="w-8 h-8 rounded-full bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-sm"
-          title="Avanti"
-        >
-          <ChevronRight size={18} />
-        </button>
+        {/* Mobile Brand Logo */}
+        <Link href="/" className="md:hidden flex items-center gap-2 pr-1">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-md shadow-indigo-500/25">
+            <Disc3 size={18} className="text-white animate-[spin_10s_linear_infinite]" />
+          </div>
+          <span className="font-extrabold text-sm text-white tracking-tight">Navidrome</span>
+        </Link>
+
+        {/* Desktop History Arrows */}
+        <div className="hidden md:flex items-center gap-1.5">
+          <button
+            onClick={() => router.back()}
+            className="w-8 h-8 rounded-full bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-sm"
+            title="Indietro"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            onClick={() => router.forward()}
+            className="w-8 h-8 rounded-full bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center justify-center transition-colors shadow-sm"
+            title="Avanti"
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
       </div>
 
-      {/* Live Search Bar wrapped in Suspense */}
-      <Suspense fallback={<LiveSearchBarFallback />}>
-        <LiveSearchBarInner />
-      </Suspense>
+      {/* Center: Live Search Bar (Desktop only, mobile has Search tab) */}
+      <div className="hidden md:flex flex-1 max-w-lg mx-4">
+        <Suspense fallback={<LiveSearchBarFallback />}>
+          <LiveSearchBarInner />
+        </Suspense>
+      </div>
 
-      {/* Server Status Pill */}
-      <div className="flex items-center gap-3">
-        {isOfflineMode ? (
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
-            <WifiOff size={14} /> Offline Mode
-          </div>
-        ) : isConnected && activeProfile ? (
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
-            <ShieldCheck size={14} /> {activeProfile.name || "Navidrome"}
-          </div>
-        ) : (
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium">
-            <Server size={14} /> Demo Mode
-          </div>
-        )}
+      {/* Right: Settings Icon Button */}
+      <div className="flex items-center gap-2">
+        <Link
+          href="/settings"
+          className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center transition-all shadow-sm active:scale-95 group"
+          title="Impostazioni"
+        >
+          <Settings
+            size={18}
+            className="text-zinc-400 group-hover:text-indigo-400 group-hover:rotate-45 transition-all"
+          />
+        </Link>
       </div>
     </header>
   );
