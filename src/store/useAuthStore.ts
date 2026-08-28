@@ -9,7 +9,7 @@ interface AuthState {
   isConnected: boolean;
   isConnecting: boolean;
   isOfflineMode: boolean;
-  serverInfo: { version?: string; openSubsonic?: boolean } | null;
+  serverInfo: { version?: string; serverVersion?: string; openSubsonic?: boolean } | null;
   error: string | null;
 
   // Actions
@@ -18,7 +18,7 @@ interface AuthState {
   removeProfile: (id: string) => void;
   setActiveProfile: (id: string) => Promise<boolean>;
   toggleOfflineMode: (force?: boolean) => void;
-  testConnection: (profile?: ServerProfile) => Promise<{ success: boolean; error?: string }>;
+  testConnection: (profile?: ServerProfile) => Promise<{ success: boolean; error?: string; version?: string }>;
   initializeAuth: () => Promise<void>;
 }
 
@@ -98,7 +98,7 @@ export const useAuthStore = create<AuthState>()(
             profiles: get().profiles.map((p) => ({
               ...p,
               isActive: p.id === id,
-              serverVersion: info.serverVersion,
+              serverVersion: info.serverVersion || info.version,
               openSubsonic: info.openSubsonic,
             })),
           });
@@ -109,6 +109,7 @@ export const useAuthStore = create<AuthState>()(
             activeProfileId: id,
             isConnected: false,
             isConnecting: false,
+            serverInfo: null,
             error: message,
           });
           return false;
@@ -127,8 +128,8 @@ export const useAuthStore = create<AuthState>()(
 
         const testClient = new SubsonicClient(target);
         try {
-          await testClient.ping();
-          return { success: true };
+          const info = await testClient.ping();
+          return { success: true, version: info.version || info.serverVersion };
         } catch (err: unknown) {
           const message = err instanceof Error ? err.message : "Impossibile connettersi";
           return { success: false, error: message };
@@ -143,9 +144,9 @@ export const useAuthStore = create<AuthState>()(
             subsonicClient.setProfile(active);
             try {
               const info = await subsonicClient.ping();
-              set({ isConnected: true, serverInfo: info });
+              set({ isConnected: true, serverInfo: info, error: null });
             } catch {
-              set({ isConnected: false });
+              set({ isConnected: false, serverInfo: null });
             }
           }
         }

@@ -14,9 +14,11 @@ export default function ArtistDetailPage({ params }: { params: Promise<{ id: str
   const [artist, setArtist] = useState<Artist | null>(null);
   const [loading, setLoading] = useState(true);
   const [isStarred, setIsStarred] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
     setLoading(true);
+    setImgError(false);
 
     if (isBrowserOffline()) {
       getOfflineArtist(id)
@@ -59,7 +61,6 @@ export default function ArtistDetailPage({ params }: { params: Promise<{ id: str
     );
   }
 
-  const [imgError, setImgError] = useState(false);
   const imageUrl = artist.artistImageUrl || (artist.coverArt ? subsonicClient.getCoverArtUrl(artist.coverArt, 400) : null);
   const albums = artist.album || [];
 

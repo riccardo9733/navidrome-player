@@ -97,19 +97,16 @@ export class SubsonicClient {
 
   // --- API Methods ---
 
-  public async ping(): Promise<{ serverVersion?: string; openSubsonic?: boolean }> {
+  public async ping(): Promise<{ serverVersion?: string; version?: string; openSubsonic?: boolean }> {
     if (!this.isConfigured()) {
-      return { serverVersion: "Offline", openSubsonic: false };
+      throw new Error("Client Subsonic non configurato");
     }
-    try {
-      const res = await this.request<{ serverVersion?: string; openSubsonic?: boolean; version?: string }>("ping");
-      return {
-        serverVersion: res.serverVersion || res.version,
-        openSubsonic: res.openSubsonic ?? true,
-      };
-    } catch {
-      return { serverVersion: "Offline", openSubsonic: false };
-    }
+    const res = await this.request<{ serverVersion?: string; openSubsonic?: boolean; version?: string }>("ping");
+    return {
+      serverVersion: res.serverVersion || res.version,
+      version: res.serverVersion || res.version,
+      openSubsonic: res.openSubsonic ?? true,
+    };
   }
 
   public async getArtists(): Promise<Artist[]> {

@@ -55,7 +55,7 @@ export default function SettingsPage() {
   const [password, setPassword] = useState("");
   const [legacyAuth, setLegacyAuth] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [testResult, setTestResult] = useState<{ success?: boolean; error?: string } | null>(null);
+  const [testResult, setTestResult] = useState<{ success?: boolean; error?: string; version?: string } | null>(null);
 
   const activeProfile = profiles.find((p) => p.id === activeProfileId);
 
@@ -111,6 +111,8 @@ export default function SettingsPage() {
                   ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
                   : isConnected && activeProfile
                   ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                  : activeProfile
+                  ? "bg-red-500/10 text-red-400 border border-red-500/20"
                   : "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
               }`}
             >
@@ -118,6 +120,8 @@ export default function SettingsPage() {
                 <WifiOff size={20} />
               ) : isConnected && activeProfile ? (
                 <ShieldCheck size={20} />
+              ) : activeProfile ? (
+                <Server size={20} className="text-red-400" />
               ) : (
                 <Server size={20} />
               )}
@@ -134,6 +138,10 @@ export default function SettingsPage() {
                   <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Connesso a {activeProfile.name}
                   </span>
+                ) : activeProfile ? (
+                  <span className="px-2.5 py-0.5 rounded-full bg-red-500/20 text-red-400 text-xs font-semibold flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-400" /> Disconnesso / Non raggiungibile
+                  </span>
                 ) : (
                   <span className="px-2.5 py-0.5 rounded-full bg-zinc-800 text-zinc-400 text-xs font-semibold">
                     Nessun server configurato
@@ -143,8 +151,10 @@ export default function SettingsPage() {
               <p className="text-xs text-zinc-400 mt-0.5">
                 {isOfflineMode
                   ? "Riproduzione abilitata solo per i brani e album scaricati in locale"
-                  : activeProfile
+                  : isConnected && activeProfile
                   ? `Server: ${activeProfile.url} (Utente: ${activeProfile.username})`
+                  : activeProfile
+                  ? `Impossibile raggiungere ${activeProfile.url}. Verifica che Navidrome sia avviato e raggiungibile.`
                   : "Nessun server Navidrome configurato. Aggiungine uno qui sotto per accedere alla tua musica."}
               </p>
             </div>
@@ -264,7 +274,7 @@ export default function SettingsPage() {
           >
             {testResult.success ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
             {testResult.success
-              ? `Connessione a Navidrome riuscita! (Versione server: ${serverInfo?.version || "1.16+"})`
+              ? `Connessione a Navidrome riuscita! (Versione server: ${testResult.version || serverInfo?.version || serverInfo?.serverVersion || "1.16+"})`
               : `Errore di connessione: ${testResult.error}`}
           </div>
         )}
