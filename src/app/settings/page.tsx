@@ -20,6 +20,7 @@ import { BitrateOption, TranscodingFormat } from "../../lib/subsonic/types";
 import { clearAllDownloads } from "../../lib/db/downloadManager";
 import { PwaInstallCard } from "../../components/settings/PwaInstallCard";
 import { ThemeSelector } from "../../components/settings/ThemeSelector";
+import { OpenRouterSettingsCard } from "../../components/settings/OpenRouterSettingsCard";
 
 export default function SettingsPage() {
   const profiles = useAuthStore((s) => s.profiles);
@@ -399,7 +400,10 @@ export default function SettingsPage() {
       {/* 2. Theme & Appearance Section (Shadcn Themes & Light/Dark/OLED) */}
       <ThemeSelector />
 
-      {/* 3. PWA Mobile & Desktop Section */}
+      {/* 3. OpenRouter AI Section */}
+      <OpenRouterSettingsCard />
+
+      {/* 4. PWA Mobile & Desktop Section */}
       <PwaInstallCard />
 
       {/* 4. Streaming & Quality Settings */}

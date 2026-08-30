@@ -32,8 +32,10 @@ import { downloadTrack, isTrackDownloaded, deleteDownloadedTrack } from "../../l
 import { SyncedLyrics } from "./SyncedLyrics";
 import { VisualizerCanvas } from "../audio/VisualizerCanvas";
 import { DEFAULT_EQ_PRESETS, useSettingsStore } from "../../store/useSettingsStore";
+import { AiVibeView } from "./AiVibeView";
+import { recommendNextTracks } from "../../lib/ai/openRouterClient";
 
-type PlayerTab = "player" | "lyrics" | "queue" | "equalizer";
+type PlayerTab = "player" | "lyrics" | "queue" | "equalizer" | "ai";
 
 export function FullscreenPlayerModal() {
   const isFullscreenOpen = usePlayerStore((s) => s.isFullscreenOpen);
@@ -59,20 +61,58 @@ export function FullscreenPlayerModal() {
   const cycleRepeatMode = usePlayerStore((s) => s.cycleRepeatMode);
   const activeColor = usePlayerStore((s) => s.activeColor);
   const playSong = usePlayerStore((s) => s.playSong);
+  const addToQueue = usePlayerStore((s) => s.addToQueue);
   const removeFromQueue = usePlayerStore((s) => s.removeFromQueue);
 
-  // Equalizer store bindings
+  // Equalizer & OpenRouter store bindings
   const equalizerEnabled = useSettingsStore((s) => s.equalizerEnabled);
   const setEqualizerEnabled = useSettingsStore((s) => s.setEqualizerEnabled);
   const equalizerPreset = useSettingsStore((s) => s.equalizerPreset);
   const setEqualizerPreset = useSettingsStore((s) => s.setEqualizerPreset);
   const equalizerGains = useSettingsStore((s) => s.equalizerGains);
   const setEqualizerBandGain = useSettingsStore((s) => s.setEqualizerBandGain);
+  const openRouterApiKey = useSettingsStore((s) => s.openRouterApiKey);
+  const openRouterModel = useSettingsStore((s) => s.openRouterModel);
+  const openRouterBaseUrl = useSettingsStore((s) => s.openRouterBaseUrl);
 
   const [activeTab, setActiveTab] = useState<PlayerTab>("player");
   const [isStarred, setIsStarred] = useState(false);
   const [isDownloaded, setIsDownloaded] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [isExtendingQueue, setIsExtendingQueue] = useState(false);
+
+  const handleExtendQueueWithAi = async () => {
+    if (!openRouterApiKey || !currentSong || isExtendingQueue) return;
+    setIsExtendingQueue(true);
+    try {
+      let candidates = await subsonicClient.getRandomSongs(35, currentSong.genre);
+      if (!candidates || candidates.length < 5) {
+        candidates = await subsonicClient.getRandomSongs(40);
+      }
+      const currentQueueIds = new Set(queue.map((q) => q.id));
+      currentQueueIds.add(currentSong.id);
+      const filtered = candidates.filter((c) => !currentQueueIds.has(c.id));
+      const pool = filtered.length >= 3 ? filtered : candidates;
+      const recentSongs = queue.slice(Math.max(0, queueIndex - 2), queueIndex + 1);
+
+      const recommended = await recommendNextTracks({
+        currentTrack: currentSong,
+        recentTracks: recentSongs,
+        candidates: pool,
+        apiKey: openRouterApiKey,
+        model: openRouterModel,
+        baseUrl: openRouterBaseUrl,
+      });
+
+      if (recommended.length > 0) {
+        addToQueue(recommended);
+      }
+    } catch (e) {
+      console.error("Failed to extend queue with AI:", e);
+    } finally {
+      setIsExtendingQueue(false);
+    }
+  };
 
   useEffect(() => {
     if (currentSong) {
@@ -186,6 +226,16 @@ export function FullscreenPlayerModal() {
                 }`}
               >
                 <Sliders size={14} /> EQ
+              </button>
+              <button
+                onClick={() => setActiveTab("ai")}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                  activeTab === "ai"
+                    ? "bg-primary text-primary-foreground shadow-md"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Sparkles size={14} /> AI
               </button>
             </div>
 
@@ -389,9 +439,22 @@ export function FullscreenPlayerModal() {
                   <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Prossimi in Coda ({queue.length})
                   </span>
-                  <span className="text-xs text-primary font-medium">
-                    {isShuffled ? "Riproduzione Casuale Attiva" : "Ordine Normale"}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {openRouterApiKey && (
+                      <button
+                        onClick={handleExtendQueueWithAi}
+                        disabled={isExtendingQueue}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/15 hover:bg-primary/25 text-primary text-xs font-semibold border border-primary/30 transition-all cursor-pointer disabled:opacity-50"
+                        title="Aggiungi automaticamente brani dal vibe simile dalla tua libreria"
+                      >
+                        <Sparkles size={12} className={isExtendingQueue ? "animate-spin" : ""} />
+                        <span>{isExtendingQueue ? "Analisi..." : "Continua Vibe"}</span>
+                      </button>
+                    )}
+                    <span className="text-xs text-primary font-medium">
+                      {isShuffled ? "Casuale" : "Normale"}
+                    </span>
+                  </div>
                 </div>
 
                 {queue.map((track, idx) => {
@@ -503,6 +566,16 @@ export function FullscreenPlayerModal() {
                     );
                   })}
                 </div>
+              </div>
+            )}
+
+            {/* TAB 5: AI & VIBE */}
+            {activeTab === "ai" && (
+              <div className="w-full h-full flex flex-col animate-in fade-in duration-300 max-h-[68vh] overflow-y-auto pr-1">
+                <AiVibeView
+                  currentSong={currentSong}
+                  onCloseFullscreen={() => setFullscreenOpen(false)}
+                />
               </div>
             )}
           </div>

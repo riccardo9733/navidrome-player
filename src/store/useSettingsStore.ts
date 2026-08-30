@@ -52,6 +52,11 @@ interface SettingsState {
   themeMode: ThemeMode;
   themeColor: ThemeColor;
 
+  // OpenRouter AI Settings
+  openRouterApiKey: string;
+  openRouterModel: string;
+  openRouterBaseUrl: string;
+
   // Actions
   setBitrate: (bitrate: BitrateOption) => void;
   setFormat: (format: TranscodingFormat) => void;
@@ -65,6 +70,9 @@ interface SettingsState {
   setEqualizerBandGain: (bandIndex: number, gain: number) => void;
   setThemeMode: (theme: ThemeMode) => void;
   setThemeColor: (color: ThemeColor) => void;
+  setOpenRouterApiKey: (key: string) => void;
+  setOpenRouterModel: (model: string) => void;
+  setOpenRouterBaseUrl: (baseUrl: string) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -82,6 +90,9 @@ export const useSettingsStore = create<SettingsState>()(
       equalizerGains: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       themeMode: "dark",
       themeColor: "indigo",
+      openRouterApiKey: "",
+      openRouterModel: "google/gemini-2.5-flash",
+      openRouterBaseUrl: "https://openrouter.ai/api/v1",
 
       setBitrate: (bitrate) => set({ bitrate }),
       setFormat: (format) => set({ format }),
@@ -107,6 +118,9 @@ export const useSettingsStore = create<SettingsState>()(
         }),
       setThemeMode: (themeMode) => set({ themeMode }),
       setThemeColor: (themeColor) => set({ themeColor }),
+      setOpenRouterApiKey: (openRouterApiKey) => set({ openRouterApiKey }),
+      setOpenRouterModel: (openRouterModel) => set({ openRouterModel }),
+      setOpenRouterBaseUrl: (openRouterBaseUrl) => set({ openRouterBaseUrl }),
     }),
     {
       name: "navidrome-settings-storage",
